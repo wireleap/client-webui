@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>wireleap</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.9.1/dist/cdn.min.js"></script>
+</head>
+
+<body>
+  <div x-data="alpineInstance()" x-init="initialize()">
+    <div class="m-2 mb-6 space-y-2 text-xs text-gray-800">
+      <a class="my-2 text-blue-600" href="http://alonswartz-temp.s3-website-us-east-1.amazonaws.com/wireleap.com/docs/client-api/" target="_blank">API Spec</a>
+
+      <div>
+        <p class="font-md font-bold py-1">/api/status</p>
+        <template x-if="cache.status">
+          <ul>
+            <li>home: <span x-text="cache.status.home"></span></li>
+            <li>pid: <span x-text="cache.status.pid"></span></li>
+            <li>state: <span x-text="cache.status.state"></span></li>
+            <li>broker.active_circuit: <span x-text="cache.status.broker.active_circuit"></span></li>
+            <li>upgrade.required: <span x-text="cache.status.upgrade.required"></span></li>
+          </ul>
+        </template>
+      </div>
+
+      <div>
+        <p class="font-md font-bold py-1">/api/log</p>
+        <template x-if="cache.log">
+            <pre class="w-full max-h-40 overflow-y-auto" x-text="cache.log"></pre>
+        </template>
+      </div>
+
+    </div>
+  </div>
+</body>
+
+<script type="text/javascript">
+function alpineInstance() {
+  return {
+    cache: {},
+    initialize() {
+      this.apiGetJson("/api/status");
+      this.apiGetText("/api/log");
+    },
+    apiGetJson(uri) {
+      let cacheKey = uri.replaceAll("/","_").replace('_api_','');
+      fetch(uri)
+        .then(response => response.json())
+        .then(data => {
+          this.cache[cacheKey] = data;
+          //console.log(data);
+        })
+        .catch(error => {
+          console.log(error);
+        })
+        .finally(() => {
+          //console.log('finally')
+        });
+    },
+
+    apiGetText(uri) {
+      let cacheKey = uri.replaceAll("/","_").replace('_api_','');
+      fetch(uri)
+        .then(response => response.text())
+        .then(data => {
+          this.cache[cacheKey] = data;
+          //console.log(data);
+        })
+        .catch(error => {
+          console.log(error);
+        })
+        .finally(() => {
+          //console.log('finally')
+        });
+    },
+
+  }
+}
+</script>
+
+</html>
