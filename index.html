@@ -35,7 +35,10 @@
         <div class="h-full p-6">
           <div class="h-full relative space-y-3 scroll-container overflow-y-auto overflow-hidden pb-10" style="min-height: 12rem">
 
-            <a class="text-xs text-blue-600" href="http://alonswartz-temp.s3-website-us-east-1.amazonaws.com/wireleap.com/docs/client-api/" target="_blank">API Spec</a>
+            <div class="flex items-center justify-between">
+              <a class="text-xs text-blue-600" href="http://alonswartz-temp.s3-website-us-east-1.amazonaws.com/wireleap.com/docs/client-api/" target="_blank">API Spec</a>
+              <button @click="refresh()" class="border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">refresh</button>
+            </div>
 
             <p class="text-xs text-gray-900 font-medium uppercase pb-2 pt-4">Core</p>
 
@@ -273,6 +276,9 @@ function alpineInstance() {
     cache: {},
     error: {},
     initialize() {
+      this.refresh();
+    },
+    refresh() {
       this.apiGetJson("/api/version");
       this.apiGetJson("/api/status");
       this.apiGetText("/api/log");
@@ -312,7 +318,7 @@ function alpineInstance() {
           //error.text().then(data => this.error[cacheKey] = data );
         })
         .finally(() => {
-          //console.log('finally')
+          //console.log('finally');
         });
 
     },
@@ -333,7 +339,7 @@ function alpineInstance() {
           error.text().then(data => this.error[cacheKey] = data );
         })
         .finally(() => {
-          //console.log('finally')
+          //console.log('finally');
         });
     },
 
@@ -354,7 +360,7 @@ function alpineInstance() {
           error.text().then(data => this.error[cacheKey] = data );
         })
         .finally(() => {
-          //console.log('finally')
+          //console.log('finally');
         });
     },
 
