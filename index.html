@@ -37,7 +37,7 @@
 
             <a class="text-xs text-blue-600" href="http://alonswartz-temp.s3-website-us-east-1.amazonaws.com/wireleap.com/docs/client-api/" target="_blank">API Spec</a>
 
-            <details class="text-xs">
+            <details class="text-xs whitespace-nowrap">
               <summary class="font-bold">/api/version</summary>
               <template x-if="error.version"><p class="p-1 bg-red-200" x-text="error.version"></template>
               <template x-if="cache.version">
@@ -47,7 +47,7 @@
               </template>
             </details>
 
-            <details class="text-xs">
+            <details class="text-xs whitespace-nowrap">
               <summary class="font-bold">/api/status</summary>
               <template x-if="error.status"><p class="p-1 bg-red-200" x-text="error.status"></template>
               <template x-if="cache.status">
@@ -61,7 +61,7 @@
               </template>
             </details>
 
-            <details class="text-xs">
+            <details class="text-xs whitespace-nowrap">
               <summary class="font-bold">/api/config</summary>
               <template x-if="error.config"><p class="p-1 bg-red-200" x-text="error.config"></template>
               <template x-if="cache.config">
@@ -78,7 +78,7 @@
               </template>
             </details>
 
-            <details class="text-xs">
+            <details class="text-xs whitespace-nowrap">
               <summary class="font-bold">/api/runtime</summary>
               <template x-if="error.runtime"><p class="p-1 bg-red-200" x-text="error.runtime"></template>
               <template x-if="cache.runtime">
@@ -99,7 +99,7 @@
               </template>
             </details>
 
-            <details class="text-xs">
+            <details class="text-xs whitespace-nowrap">
               <summary class="font-bold">/api/accesskeys</summary>
               <template x-if="error.accesskeys"><p class="p-1 bg-red-200" x-text="error.accesskeys"></template>
               <template x-if="cache.accesskeys">
@@ -114,7 +114,7 @@
               </template>
             </details>
 
-            <details class="text-xs">
+            <details class="text-xs whitespace-nowrap">
               <summary class="font-bold">/api/relays</summary>
               <template x-if="error.relays"><p class="p-1 bg-red-200" x-text="error.relays"></template>
               <template x-if="cache.relays">
@@ -131,7 +131,7 @@
               </template>
             </details>
 
-            <details class="text-xs">
+            <details class="text-xs whitespace-nowrap">
               <summary class="font-bold">/api/contract</summary>
               <template x-if="error.contract"><p class="p-1 bg-red-200" x-text="error.contract"></template>
               <template x-if="cache.contract">
@@ -160,7 +160,7 @@
               </template>
             </details>
 
-            <details class="text-xs">
+            <details class="text-xs whitespace-nowrap">
               <summary class="font-bold">/api/forwarders/socks</summary>
               <template x-if="error.forwarders_socks"><p class="p-1 bg-red-200" x-text="error.forwarders_socks"></template>
               <template x-if="cache.forwarders_socks">
@@ -175,7 +175,7 @@
               </template>
             </details>
 
-            <details class="text-xs">
+            <details class="text-xs whitespace-nowrap">
               <summary class="font-bold">/api/forwarders/tun</summary>
               <template x-if="error.forwarders_tun"><p class="p-1 bg-red-200" x-text="error.forwarders_tun"></template>
               <template x-if="cache.forwarders_tun">
