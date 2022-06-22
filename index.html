@@ -198,7 +198,6 @@
               </template>
             </details>
 
-
           </div>
         </div>
       </div>
@@ -209,7 +208,16 @@
           <!-- Start main area-->
           <div class="relative h-screen" style="min-height: 36rem">
 
-            <div class="absolute inset-0 border-2 border-gray-200 border-dashed rounded-lg"></div>
+            <div>
+              <p class="text-xs text-gray-900 font-medium uppercase pb-2 pt-4">Socks</p>
+              <template x-if="cache.forwarders_socks">
+                <div class="text-xs">
+                  <p>state: <span x-text="cache.forwarders_socks.state"></span></p>
+                  <button @click="apiPostJson('/api/forwarders/socks/start')" class="border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">start</button>
+                  <button @click="apiPostJson('/api/forwarders/socks/stop')" class="border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">stop</button>
+                </div>
+              </template>
+            </div>
 
           </div>
         </div>
@@ -277,6 +285,36 @@ function alpineInstance() {
       this.apiGetText("/api/forwarders/socks/log");
       this.apiGetJson("/api/forwarders/tun");
       this.apiGetText("/api/forwarders/tun/log");
+    },
+    apiPostJson(uri, data={}) {
+      let options = { method: 'POST', headers: {'Content-Type': 'applications/json'}, body: JSON.stringify(data) };
+      fetch(uri, options)
+        .then(response => {
+          if (response.ok) return response.json();
+          throw response;
+        })
+        .then(data => {
+          console.log(uri);
+          console.log(data);
+
+          if (uri.startsWith("/api/forwarders/socks")) {
+            this.cache.forwarders_socks = data;
+            this.apiGetText("/api/forwarders/socks/log");
+          }
+
+          //this.cache[cacheKey] = data;
+          //this.error[cacheKey] = null;
+          //console.log(data);
+        })
+        .catch(error => {
+          console.log(error);
+          //this.cache[cacheKey] = null;
+          //error.text().then(data => this.error[cacheKey] = data );
+        })
+        .finally(() => {
+          //console.log('finally')
+        });
+
     },
     apiGetJson(uri) {
       let cacheKey = uri.replaceAll("/","_").replace('_api_','');
