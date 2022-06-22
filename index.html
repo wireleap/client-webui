@@ -16,6 +16,9 @@
 
       <div>
         <p class="font-md font-bold py-1">/api/version</p>
+        <template x-if="error.version">
+          <p class="p-1 bg-red-200" x-text="error.version">
+        </template>
         <template x-if="cache.version">
           <ul>
             <li>version: <span x-text="cache.version.version"></span></li>
@@ -25,6 +28,9 @@
 
       <div>
         <p class="font-md font-bold py-1">/api/status</p>
+        <template x-if="error.status">
+          <p class="p-1 bg-red-200" x-text="error.status">
+        </template>
         <template x-if="cache.status">
           <ul>
             <li>home: <span x-text="cache.status.home"></span></li>
@@ -38,6 +44,9 @@
 
       <div>
         <p class="font-md font-bold py-1">/api/log</p>
+        <template x-if="error.log">
+          <p class="p-1 bg-red-200" x-text="error.log">
+        </template>
         <template x-if="cache.log">
             <pre class="w-full max-h-40 overflow-y-auto" x-text="cache.log"></pre>
         </template>
@@ -45,6 +54,9 @@
 
       <div>
         <p class="font-md font-bold py-1">/api/config</p>
+        <template x-if="error.config">
+          <p class="p-1 bg-red-200" x-text="error.config">
+        </template>
         <template x-if="cache.config">
           <ul>
             <li>address: <span x-text="cache.config.address"></span></li>
@@ -61,6 +73,9 @@
 
       <div>
         <p class="font-md font-bold py-1">/api/runtime</p>
+        <template x-if="error.runtime">
+          <p class="p-1 bg-red-200" x-text="error.runtime">
+        </template>
         <template x-if="cache.runtime">
           <ul>
             <li>versions.software: <span x-text="cache.runtime.versions.software"></span></li>
@@ -81,6 +96,9 @@
 
       <div>
         <p class="font-md font-bold py-1">/api/accesskeys</p>
+        <template x-if="error.accesskeys">
+          <p class="p-1 bg-red-200" x-text="error.accesskeys">
+        </template>
         <template x-if="cache.accesskeys">
           <template x-for="accesskey in cache.accesskeys">
             <ul class="py-2">
@@ -95,6 +113,9 @@
 
       <div>
         <p class="font-md font-bold py-1">/api/relays</p>
+        <template x-if="error.relays">
+          <p class="p-1 bg-red-200" x-text="error.relays">
+        </template>
         <template x-if="cache.relays">
           <div class="w-full max-h-40 overflow-y-auto bg-gray-100">
             <template x-for="relay in cache.relays">
@@ -113,6 +134,9 @@
 
       <div>
         <p class="font-md font-bold py-1">/api/contract</p>
+        <template x-if="error.contract">
+          <p class="p-1 bg-red-200" x-text="error.contract">
+        </template>
         <div class="w-full max-h-40 overflow-y-auto bg-gray-100">
           <template x-if="cache.contract">
             <ul>
@@ -143,6 +167,9 @@
 
       <div>
         <p class="font-md font-bold py-1">/api/forwarders/socks</p>
+        <template x-if="error.forwarders_socks">
+          <p class="p-1 bg-red-200" x-text="error.forwarders_socks">
+        </template>
         <template x-if="cache.forwarders_socks">
           <ul>
             <li>pid: <span x-text="cache.forwarders_socks.pid"></span></li>
@@ -157,6 +184,9 @@
 
       <div>
         <p class="font-md font-bold py-1">/api/forwarders/socks/log</p>
+        <template x-if="error.forwarders_socks_log">
+          <p class="p-1 bg-red-200" x-text="error.forwarders_socks_log">
+        </template>
         <template x-if="cache.forwarders_socks_log">
           <pre class="w-full max-h-40 overflow-y-auto bg-gray-100" x-text="cache.forwarders_socks_log"></pre>
         </template>
@@ -164,6 +194,9 @@
 
       <div>
         <p class="font-md font-bold py-1">/api/forwarders/tun</p>
+        <template x-if="error.forwarders_tun">
+          <p class="p-1 bg-red-200" x-text="error.forwarders_tun">
+        </template>
         <template x-if="cache.forwarders_tun">
           <ul>
             <li>pid: <span x-text="cache.forwarders_tun.pid"></span></li>
@@ -180,6 +213,9 @@
 
       <div>
         <p class="font-md font-bold py-1">/api/forwarders/tun/log</p>
+        <template x-if="error.forwarders_tun_log">
+          <p class="p-1 bg-red-200" x-text="error.forwarders_tun_log">
+        </template>
         <template x-if="cache.forwarders_tun_log">
           <pre class="w-full max-h-40 overflow-y-auto bg-gray-100" x-text="cache.forwarders_tun_log"></pre>
         </template>
@@ -193,6 +229,7 @@
 function alpineInstance() {
   return {
     cache: {},
+    error: {},
     initialize() {
       this.apiGetJson("/api/version");
       this.apiGetJson("/api/status");
@@ -210,13 +247,18 @@ function alpineInstance() {
     apiGetJson(uri) {
       let cacheKey = uri.replaceAll("/","_").replace('_api_','');
       fetch(uri)
-        .then(response => response.json())
+        .then(response => {
+          if (response.ok) return response.json();
+          throw response;
+        })
         .then(data => {
           this.cache[cacheKey] = data;
+          this.error[cacheKey] = null;
           //console.log(data);
         })
         .catch(error => {
-          console.log(error);
+          this.cache[cacheKey] = null;
+          error.text().then(data => this.error[cacheKey] = data );
         })
         .finally(() => {
           //console.log('finally')
@@ -226,13 +268,18 @@ function alpineInstance() {
     apiGetText(uri) {
       let cacheKey = uri.replaceAll("/","_").replace('_api_','');
       fetch(uri)
-        .then(response => response.text())
+        .then(response => {
+          if (response.ok) return response.text();
+          throw response;
+        })
         .then(data => {
           this.cache[cacheKey] = data;
+          this.error[cacheKey] = null;
           //console.log(data);
         })
         .catch(error => {
-          console.log(error);
+          this.cache[cacheKey] = null;
+          error.text().then(data => this.error[cacheKey] = data );
         })
         .finally(() => {
           //console.log('finally')
