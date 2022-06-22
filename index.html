@@ -211,13 +211,25 @@
           <!-- Start main area-->
           <div class="relative h-screen" style="min-height: 36rem">
 
-            <div>
-              <p class="text-xs text-gray-900 font-medium uppercase pb-2 pt-4">Socks</p>
+            <div class="border border-gray-200 rounded p-2">
+              <div class="flex items-center justify-between">
+                <p class="text-xs text-gray-900 font-medium">SOCKS Forwarder</p>
+                <template x-if="cache.forwarders_socks">
+                  <p class="text-xs" :class="cache.forwarders_socks.state == 'active' ? 'text-green-600' : 'text-gray-900'"  x-text="cache.forwarders_socks.state"></p>
+                </template>
+              </div>
               <template x-if="cache.forwarders_socks">
-                <div class="text-xs">
-                  <p>state: <span x-text="cache.forwarders_socks.state"></span></p>
-                  <button @click="apiPostJson('/api/forwarders/socks/start')" class="border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">start</button>
-                  <button @click="apiPostJson('/api/forwarders/socks/stop')" class="border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">stop</button>
+                <div class="py-4">
+                  <div x-show="cache.forwarders_socks.binary.ok">
+                    <button @click="apiPostJson('/api/forwarders/socks/start')" :disabled="cache.forwarders_socks.state == 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">start</button>
+                    <button @click="apiPostJson('/api/forwarders/socks/stop')" :disabled="cache.forwarders_socks.state != 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">stop</button>
+                  </div>
+                  <div x-show="!cache.forwarders_socks.binary.ok" class="bg-red-200 p-2 mt-5 rounded text-xs">
+                    <ul>
+                      <li>binary.state.exists: <span x-text="cache.forwarders_socks.binary.state.exists"></span></li>
+                      <li>binary.state.chmod_x: <span x-text="cache.forwarders_socks.binary.state.chmod_x"></span></li>
+                    </ul>
+                  </div>
                 </div>
               </template>
             </div>
