@@ -15,6 +15,15 @@
       <a class="my-2 text-blue-600" href="http://alonswartz-temp.s3-website-us-east-1.amazonaws.com/wireleap.com/docs/client-api/" target="_blank">API Spec</a>
 
       <div>
+        <p class="font-md font-bold py-1">/api/version</p>
+        <template x-if="cache.version">
+          <ul>
+            <li>version: <span x-text="cache.version.version"></span></li>
+          </ul>
+        </template>
+      </div>
+
+      <div>
         <p class="font-md font-bold py-1">/api/status</p>
         <template x-if="cache.status">
           <ul>
@@ -34,6 +43,148 @@
         </template>
       </div>
 
+      <div>
+        <p class="font-md font-bold py-1">/api/config</p>
+        <template x-if="cache.config">
+          <ul>
+            <li>address: <span x-text="cache.config.address"></span></li>
+            <li>broker.address: <span x-text="cache.config.broker.address"></span></li>
+            <li>broker.accesskey.use_on_demand: <span x-text="cache.config.broker.accesskey.use_on_demand"></span></li>
+            <li>broker.circuit.timeout: <span x-text="cache.config.broker.circuit.timeout"></span></li>
+            <li>broker.circuit.hops: <span x-text="cache.config.broker.circuit.hops"></span></li>
+            <li>broker.circuit.whitelist: <span x-text="cache.config.broker.circuit.whitelist"></span></li>
+            <li>forwarders.socks.address: <span x-text="cache.config.forwarders.socks.address"></span></li>
+            <li>forwarders.tun.address: <span x-text="cache.config.forwarders.tun.address"></span></li>
+          </ul>
+        </template>
+      </div>
+
+      <div>
+        <p class="font-md font-bold py-1">/api/runtime</p>
+        <template x-if="cache.runtime">
+          <ul>
+            <li>versions.software: <span x-text="cache.runtime.versions.software"></span></li>
+            <li>versions.api: <span x-text="cache.runtime.versions.api"></span></li>
+            <li>versions.client-contract: <span x-text="cache.runtime.versions['client-contract']"></span></li>
+            <li>versions.client-dir: <span x-text="cache.runtime.versions['client-dir']"></span></li>
+            <li>versions.client-relay: <span x-text="cache.runtime.versions['client-relay']"></span></li>
+            <li>upgrade.supported: <span x-text="cache.runtime.upgrade.supported"></span></li>
+            <li>build.gitcommit: <span x-text="cache.runtime.build.gitcommit"></span></li>
+            <li>build.goversion: <span x-text="cache.runtime.build.goversion"></span></li>
+            <li>build.time: <span x-text="cache.runtime.build.time"></span></li>
+            <li>build.flags: <span x-text="cache.runtime.build.flags"></span></li>
+            <li>platform.os: <span x-text="cache.runtime.platform.os"></span></li>
+            <li>platform.arch: <span x-text="cache.runtime.platform.arch"></span></li>
+          </ul>
+        </template>
+      </div>
+
+      <div>
+        <p class="font-md font-bold py-1">/api/accesskeys</p>
+        <template x-if="cache.accesskeys">
+          <template x-for="accesskey in cache.accesskeys">
+            <ul class="py-2">
+              <li>contract: <span x-text="accesskey.contract"></span></li>
+              <li>duration: <span x-text="accesskey.duration"></span></li>
+              <li>expiration: <span x-text="accesskey.expiration"></span></li>
+              <li>state: <span x-text="accesskey.state"></span></li>
+            </ul>
+          </template>
+        </template>
+      </div>
+
+      <div>
+        <p class="font-md font-bold py-1">/api/relays</p>
+        <template x-if="cache.relays">
+          <div class="w-full max-h-40 overflow-y-auto bg-gray-100">
+            <template x-for="relay in cache.relays">
+              <ul class="py-1">
+                <li>role: <span x-text="relay.role"></span></li>
+                <li>address: <span x-text="relay.address"></span></li>
+                <li>pubkey: <span x-text="relay.pubkey"></span></li>
+                <li>selectable: <span x-text="relay.selectable"></span></li>
+                <li>versions.software: <span x-text="relay.versions.software"></span></li>
+                <li>versions.client-relay: <span x-text="relay.versions['client-relay']"></span></li>
+              </ul>
+            </template>
+          </div>
+        </template>
+      </div>
+
+      <div>
+        <p class="font-md font-bold py-1">/api/contract</p>
+        <div class="w-full max-h-40 overflow-y-auto bg-gray-100">
+          <template x-if="cache.contract">
+            <ul>
+              <li>pubkey: <span x-text="cache.contract.pubkey"></span></li>
+              <li>version: <span x-text="cache.contract.version"></span></li>
+              <li>endpoint: <span x-text="cache.contract.endpoint"></span></li>
+              <template x-for="proof_of_funding in cache.contract.proof_of_funding">
+                <ul class="py-2">
+                  <li>proof_of_funding.type: <span x-text="proof_of_funding.type"></span></li>
+                  <li>proof_of_funding.endpoint: <span x-text="proof_of_funding.endpoint"></span></li>
+                  <li>proof_of_funding.pubkey: <span x-text="proof_of_funding.pubkey"></span></li>
+                </ul>
+              </template>
+              <li>servicekey.duration: <span x-text="cache.contract.servicekey.duration"></span></li>
+              <li>servicekey.currency: <span x-text="cache.contract.servicekey.currency"></span></li>
+              <li>servicekey.value: <span x-text="cache.contract.servicekey.value"></span></li>
+              <li>directory.endpoint: <span x-text="cache.contract.directory.endpoint"></span></li>
+              <li>directory.public_key: <span x-text="cache.contract.directory.public_key"></span></li>
+              <li>metadata.operator: <span x-text="cache.contract.metadata.operator"></span></li>
+              <li>metadata.operator_url: <span x-text="cache.contract.metadata.operator_url"></span></li>
+              <li>metadata.name: <span x-text="cache.contract.metadata.name"></span></li>
+              <li>metadata.terms_of_service: <span x-text="cache.contract.metadata.terms_of_service"></span></li>
+              <li>metadata.privacy_policy: <span x-text="cache.contract.metadata.privacy_policy"></span></li>
+            </ul>
+          </template>
+        </div>
+      </div>
+
+      <div>
+        <p class="font-md font-bold py-1">/api/forwarders/socks</p>
+        <template x-if="cache.forwarders_socks">
+          <ul>
+            <li>pid: <span x-text="cache.forwarders_socks.pid"></span></li>
+            <li>state: <span x-text="cache.forwarders_socks.state"></span></li>
+            <li>address: <span x-text="cache.forwarders_socks.address"></span></li>
+            <li>binary.ok: <span x-text="cache.forwarders_socks.binary.ok"></span></li>
+            <li>binary.state.exists: <span x-text="cache.forwarders_socks.binary.state.exists"></span></li>
+            <li>binary.state.chmod_x: <span x-text="cache.forwarders_socks.binary.state.chmod_x"></span></li>
+          </ul>
+        </template>
+      </div>
+
+      <div>
+        <p class="font-md font-bold py-1">/api/forwarders/socks/log</p>
+        <template x-if="cache.forwarders_socks_log">
+          <pre class="w-full max-h-40 overflow-y-auto bg-gray-100" x-text="cache.forwarders_socks_log"></pre>
+        </template>
+      </div>
+
+      <div>
+        <p class="font-md font-bold py-1">/api/forwarders/tun</p>
+        <template x-if="cache.forwarders_tun">
+          <ul>
+            <li>pid: <span x-text="cache.forwarders_tun.pid"></span></li>
+            <li>state: <span x-text="cache.forwarders_tun.state"></span></li>
+            <li>address: <span x-text="cache.forwarders_tun.address"></span></li>
+            <li>binary.ok: <span x-text="cache.forwarders_tun.binary.ok"></span></li>
+            <li>binary.state.exists: <span x-text="cache.forwarders_tun.binary.state.exists"></span></li>
+            <li>binary.state.chown_0: <span x-text="cache.forwarders_tun.binary.state.chown_0"></span></li>
+            <li>binary.state.chmod_x: <span x-text="cache.forwarders_tun.binary.state.chmod_x"></span></li>
+            <li>binary.state.chmod_us: <span x-text="cache.forwarders_tun.binary.state.chmod_us"></span></li>
+          </ul>
+        </template>
+      </div>
+
+      <div>
+        <p class="font-md font-bold py-1">/api/forwarders/tun/log</p>
+        <template x-if="cache.forwarders_tun_log">
+          <pre class="w-full max-h-40 overflow-y-auto bg-gray-100" x-text="cache.forwarders_tun_log"></pre>
+        </template>
+      </div>
+
     </div>
   </div>
 </body>
@@ -43,8 +194,18 @@ function alpineInstance() {
   return {
     cache: {},
     initialize() {
+      this.apiGetJson("/api/version");
       this.apiGetJson("/api/status");
       this.apiGetText("/api/log");
+      this.apiGetJson("/api/config");
+      this.apiGetJson("/api/runtime");
+      this.apiGetJson("/api/accesskeys");
+      this.apiGetJson("/api/relays");
+      this.apiGetJson("/api/contract");
+      this.apiGetJson("/api/forwarders/socks");
+      this.apiGetText("/api/forwarders/socks/log");
+      this.apiGetJson("/api/forwarders/tun");
+      this.apiGetText("/api/forwarders/tun/log");
     },
     apiGetJson(uri) {
       let cacheKey = uri.replaceAll("/","_").replace('_api_','');
