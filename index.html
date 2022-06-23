@@ -273,6 +273,12 @@
                   <button @click="apiPostJson('/api/accesskeys/activate')" :disabled="!cache.accesskeys" x-show="!cache.config.broker.accesskey.use_on_demand" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">activate accesskey</button>
                 </div>
               </template>
+
+              <div class="w-full flex items-center text-xs space-x-2" x-data="{url: 'https://libre.wireleap.com/accesskeys'}">
+                <input type="url" x-model="url" class="border border-gray-200 rounded-md p-1.5 focus:ring-indigo-500 focus:border-indigo-500 block w-full">
+                <button @click="apiPostJson('/api/accesskeys/import', {'url': url})" :disabled="!url" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">import</button>
+              </div>
+
             </div>
 
           </div>
@@ -377,6 +383,13 @@ function alpineInstance() {
             //this.cache.config = data;
             //TODO: values in api don't reflect actual values
             //this.apiGetJson("/api/config");
+            this.apiGetText("/api/log");
+          }
+
+          if (uri.startsWith("/api/accesskeys")) {
+            //TODO: returns raw json file contents, not list of accesskey objects
+            //this.cache.accesskeys = data; // append to existing
+            this.apiGetJson("/api/accesskeys");
             this.apiGetText("/api/log");
           }
 
