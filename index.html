@@ -259,6 +259,20 @@
               </template>
             </div>
 
+            <div class="border border-gray-200 rounded p-2">
+              <div class="flex items-center justify-between">
+                <p class="text-xs text-gray-900 font-medium">Accesskeys</p>
+              </div>
+              <template x-if="cache.config">
+                <div class="py-4">
+                  <form class="w-full flex items-center text-xs space-x-2">
+                    <input type="checkbox" id="use_on_demand" @change="setConfigBrokerAccesskeyUseondemand($event.target.checked)" :checked="cache.config.broker.accesskey.use_on_demand">
+                    <label for="use_on_demand">use on demand (<span x-text="cache.config.broker.accesskey.use_on_demand"></span>)</label>
+                  </form>
+                </div>
+              </template>
+            </div>
+
           </div>
         </div>
       </div>
@@ -271,7 +285,7 @@
           <div>
             <p class="text-sm font-bold py-2">Controller</p>
             <template x-if="error.log">
-              <p class="p-1 bg-red-200 text-xs" x-text="error.log">
+              <p class="p-1 bg-red-200 text-xs rounded" x-text="error.log">
             </template>
             <template x-if="cache.log">
               <pre class="w-full max-h-52 overflow-y-auto text-xs scroll-container" x-text="cache.log"></pre>
@@ -281,7 +295,7 @@
           <div>
             <p class="text-sm font-bold py-2">SOCKS Forwarder</p>
             <template x-if="error.forwarders_socks_log">
-              <p class="p-1 bg-red-200 text-xs" x-text="error.forwarders_socks_log">
+              <p class="p-1 bg-red-200 text-xs rounded" x-text="error.forwarders_socks_log">
             </template>
             <template x-if="cache.forwarders_socks_log">
               <pre class="w-full max-h-52 overflow-y-auto text-xs scroll-container" x-text="cache.forwarders_socks_log"></pre>
@@ -291,7 +305,7 @@
           <div>
             <p class="text-sm font-bold py-2">TUN Forwarder</p>
             <template x-if="error.forwarders_tun_log">
-              <p class="p-1 bg-red-200 text-xs" x-text="error.forwarders_tun_log">
+              <p class="p-1 bg-red-200 text-xs rounded" x-text="error.forwarders_tun_log">
             </template>
             <template x-if="cache.forwarders_tun_log">
               <pre class="w-full max-h-52 overflow-y-auto text-xs scroll-container" x-text="cache.forwarders_tun_log"></pre>
@@ -327,7 +341,13 @@ function alpineInstance() {
       this.apiGetJson("/api/forwarders/socks");
       this.apiGetText("/api/forwarders/socks/log");
       this.apiGetJson("/api/forwarders/tun");
-      this.apiGetText("/api/forwarders/tun/log");
+      //this.apiGetText("/api/forwarders/tun/log");
+    },
+    setConfigBrokerAccesskeyUseondemand(bool) {
+      //TODO: values in api don't reflect actual values
+      //let data = {"broker": {"accesskey": {"use_on_demand": bool}}};
+      //this.apiPostJson("/api/config", data);
+      this.cache.config.broker.accesskey.use_on_demand = bool;
     },
     apiPostJson(uri, data={}) {
       let options = { method: 'POST', headers: {'Content-Type': 'applications/json'}, body: JSON.stringify(data) };
@@ -348,6 +368,14 @@ function alpineInstance() {
           if (uri.startsWith("/api/forwarders/tun")) {
             this.cache.forwarders_tun = data;
             this.apiGetText("/api/forwarders/tun/log");
+          }
+
+          if (uri.startsWith("/api/config")) {
+            //TODO: not returning config object
+            //this.cache.config = data;
+            //TODO: values in api don't reflect actual values
+            //this.apiGetJson("/api/config");
+            this.apiGetText("/api/log");
           }
 
           //this.cache[cacheKey] = data;
