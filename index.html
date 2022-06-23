@@ -264,11 +264,13 @@
                 <p class="text-xs text-gray-900 font-medium">Accesskeys</p>
               </div>
               <template x-if="cache.config">
-                <div class="py-4">
+                <div class="py-4 space-y-2">
                   <form class="w-full flex items-center text-xs space-x-2">
                     <input type="checkbox" id="use_on_demand" @change="setConfigBrokerAccesskeyUseondemand($event.target.checked)" :checked="cache.config.broker.accesskey.use_on_demand">
                     <label for="use_on_demand">use on demand (<span x-text="cache.config.broker.accesskey.use_on_demand"></span>)</label>
                   </form>
+                  <!-- TODO: disabled - actually check if activation is needed and possible -->
+                  <button @click="apiPostJson('/api/accesskeys/activate')" :disabled="!cache.accesskeys" x-show="!cache.config.broker.accesskey.use_on_demand" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">activate accesskey</button>
                 </div>
               </template>
             </div>
