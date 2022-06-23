@@ -209,7 +209,7 @@
       <div class="bg-white lg:min-w-0 lg:flex-1">
         <div class="h-full p-6">
           <!-- Start main area-->
-          <div class="relative h-screen" style="min-height: 36rem">
+          <div class="relative h-screen space-y-5" style="min-height: 36rem">
 
             <div class="border border-gray-200 rounded p-2">
               <div class="flex items-center justify-between">
@@ -228,6 +228,31 @@
                     <ul>
                       <li>binary.state.exists: <span x-text="cache.forwarders_socks.binary.state.exists"></span></li>
                       <li>binary.state.chmod_x: <span x-text="cache.forwarders_socks.binary.state.chmod_x"></span></li>
+                    </ul>
+                  </div>
+                </div>
+              </template>
+            </div>
+
+            <div class="border border-gray-200 rounded p-2">
+              <div class="flex items-center justify-between">
+                <p class="text-xs text-gray-900 font-medium">TUN Forwarder</p>
+                <template x-if="cache.forwarders_tun">
+                  <p class="text-xs" :class="cache.forwarders_tun.state == 'active' ? 'text-green-600' : 'text-gray-900'"  x-text="cache.forwarders_tun.state"></p>
+                </template>
+              </div>
+              <template x-if="cache.forwarders_tun">
+                <div class="py-4">
+                  <div x-show="cache.forwarders_tun.binary.ok">
+                    <button @click="apiPostJson('/api/forwarders/tun/start')" :disabled="cache.forwarders_tun.state == 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">start</button>
+                    <button @click="apiPostJson('/api/forwarders/tun/stop')" :disabled="cache.forwarders_tun.state != 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">stop</button>
+                  </div>
+                  <div x-show="!cache.forwarders_tun.binary.ok" class="bg-red-200 p-2 mt-5 rounded text-xs">
+                    <ul>
+                      <li>binary.state.exists: <span x-text="cache.forwarders_tun.binary.state.exists"></span></li>
+                      <li>binary.state.chown_0: <span x-text="cache.forwarders_tun.binary.state.chown_0"></span></li>
+                      <li>binary.state.chmod_x: <span x-text="cache.forwarders_tun.binary.state.chmod_x"></span></li>
+                      <li>binary.state.chmod_us: <span x-text="cache.forwarders_tun.binary.state.chmod_us"></span></li>
                     </ul>
                   </div>
                 </div>
@@ -318,6 +343,11 @@ function alpineInstance() {
           if (uri.startsWith("/api/forwarders/socks")) {
             this.cache.forwarders_socks = data;
             this.apiGetText("/api/forwarders/socks/log");
+          }
+
+          if (uri.startsWith("/api/forwarders/tun")) {
+            this.cache.forwarders_tun = data;
+            this.apiGetText("/api/forwarders/tun/log");
           }
 
           //this.cache[cacheKey] = data;
