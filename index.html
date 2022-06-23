@@ -221,7 +221,7 @@
                 </div>
                 <div class="ml-auto pl-3">
                   <div class="-mx-1.5 -my-1.5">
-                    <button @click="alertSuccess=''"type="button" class="inline-flex bg-green-50 rounded-md p-1.5 text-green-500 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-green-50 focus:ring-green-600">
+                    <button @click="alertSuccess=''" type="button" class="inline-flex bg-green-50 rounded-md p-1.5 text-green-500 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-green-50 focus:ring-green-600">
                       <span class="sr-only">Dismiss</span>
                       <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -245,6 +245,23 @@
                         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                       </svg>
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div x-cloak x-transition x-show="alertInfo" class="mb-5 rounded-md bg-gray-50 p-3">
+              <div class="flex items-center">
+                <div class="ml-3">
+                  <p class="text-xs text-gray-800" x-text="alertInfo"></p>
+                </div>
+                <div class="ml-auto pl-3">
+                  <div class="-mx-1.5 -my-1.5">
+                    <div class="text-gray-800 rounded-full p-1.5 transition duration-300">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin h-4 w-4" viewBox="0 0 1024 1024" fill="currentColor">
+                        <path d="M909.1 209.3l-56.4 44.1C775.8 155.1 656.2 92 521.9 92 290 92 102.3 279.5 102 511.5 101.7 743.7 289.8 932 521.9 932c181.3 0 335.8-115 394.6-276.1 1.5-4.2-.7-8.9-4.9-10.3l-56.7-19.5a8 8 0 00-10.1 4.8c-1.8 5-3.8 10-5.9 14.9-17.3 41-42.1 77.8-73.7 109.4A344.77 344.77 0 01655.9 829c-42.3 17.9-87.4 27-133.8 27-46.5 0-91.5-9.1-133.8-27A341.5 341.5 0 01279 755.2a342.16 342.16 0 01-73.7-109.4c-17.9-42.4-27-87.4-27-133.9s9.1-91.5 27-133.9c17.3-41 42.1-77.8 73.7-109.4 31.6-31.6 68.4-56.4 109.3-73.8 42.3-17.9 87.4-27 133.8-27 46.5 0 91.5 9.1 133.8 27a341.5 341.5 0 01109.3 73.8c9.9 9.9 19.2 20.4 27.8 31.4l-60.2 47a8 8 0 003 14.1l175.6 43c5 1.2 9.9-2.6 9.9-7.7l.8-180.9c-.1-6.6-7.8-10.3-13-6.2z" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -377,6 +394,7 @@ function alpineInstance() {
     error: {},
     alertSuccess: '',
     alertError: '',
+    alertInfo: '',
     initialize() {
       this.refresh();
     },
@@ -395,6 +413,7 @@ function alpineInstance() {
       //this.apiGetText("/api/forwarders/tun/log");
     },
     apiPostJson(uri, data={}) {
+      this.alertInfo = 'calling ' + uri;
       let options = { method: 'POST', headers: {'Content-Type': 'applications/json'}, body: JSON.stringify(data) };
       fetch(uri, options)
         .then(response => {
@@ -441,6 +460,7 @@ function alpineInstance() {
           error.text().then(data => this.alertError = data);
         })
         .finally(() => {
+          this.alertInfo = '';
           //console.log('finally');
         });
 
