@@ -307,7 +307,7 @@
                 <template x-if="cache.config">
                   <div class="py-4 space-y-2">
                     <form class="w-full flex items-center text-xs space-x-2">
-                      <input type="checkbox" id="use_on_demand" @change="setConfigBrokerAccesskeyUseondemand($event.target.checked)" :checked="cache.config.broker.accesskey.use_on_demand">
+                      <input type="checkbox" id="use_on_demand" @change="apiPostJson('/api/config', {'broker': {'accesskey': {'use_on_demand': $event.target.checked}}})" :checked="cache.config.broker.accesskey.use_on_demand">
                       <label for="use_on_demand">use on demand (<span x-text="cache.config.broker.accesskey.use_on_demand"></span>)</label>
                     </form>
                     <!-- TODO: disabled - actually check if activation is needed and possible -->
@@ -394,12 +394,6 @@ function alpineInstance() {
       this.apiGetJson("/api/forwarders/tun");
       //this.apiGetText("/api/forwarders/tun/log");
     },
-    setConfigBrokerAccesskeyUseondemand(bool) {
-      //TODO: values in api don't reflect actual values
-      //let data = {"broker": {"accesskey": {"use_on_demand": bool}}};
-      //this.apiPostJson("/api/config", data);
-      this.cache.config.broker.accesskey.use_on_demand = bool;
-    },
     apiPostJson(uri, data={}) {
       let options = { method: 'POST', headers: {'Content-Type': 'applications/json'}, body: JSON.stringify(data) };
       fetch(uri, options)
@@ -422,16 +416,15 @@ function alpineInstance() {
           }
 
           if (uri.startsWith("/api/config")) {
-            //TODO: not returning config object
-            //this.cache.config = data;
-            //TODO: values in api don't reflect actual values
-            //this.apiGetJson("/api/config");
+            this.cache.config = data;
             this.apiGetText("/api/log");
           }
 
           if (uri.startsWith("/api/accesskeys/import")) {
             //TODO: returns raw json file contents, not list of accesskey objects
             //this.cache.accesskeys = data; // append to existing
+            console.log('accesskeys/import');
+            console.log(data);
             this.alertSuccess = "successfully imported accesskeys";
             this.apiGetJson("/api/accesskeys");
             this.apiGetText("/api/log");
@@ -442,16 +435,10 @@ function alpineInstance() {
             this.apiGetJson("/api/accesskeys");
             this.apiGetText("/api/log");
           }
-
-          //this.cache[cacheKey] = data;
-          //this.error[cacheKey] = null;
-          //console.log(data);
         })
         .catch(error => {
           console.log(error);
           error.text().then(data => this.alertError = data);
-          //this.cache[cacheKey] = null;
-          //error.text().then(data => this.error[cacheKey] = data );
         })
         .finally(() => {
           //console.log('finally');
