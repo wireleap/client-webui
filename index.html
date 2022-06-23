@@ -8,6 +8,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.9.1/dist/cdn.min.js"></script>
   <style>
+    [x-cloak] {
+      display: none !important;
+    }
     .scroll-container::-webkit-scrollbar {
       width: 5px;
       height: 5px;
@@ -209,74 +212,112 @@
       <div class="bg-white lg:min-w-0 lg:flex-1">
         <div class="h-full p-6">
           <!-- Start main area-->
-          <div class="relative h-screen space-y-5" style="min-height: 36rem">
+          <div class="relative h-screen" style="min-height: 36rem">
 
-            <div class="border border-gray-200 rounded p-2">
-              <div class="flex items-center justify-between">
-                <p class="text-xs text-gray-900 font-medium">SOCKS Forwarder</p>
+            <div x-cloak x-transition x-show="alertSuccess" class="mb-5 rounded-md bg-green-50 p-3">
+              <div class="flex items-center">
+                <div class="ml-3">
+                  <p class="text-xs text-green-800" x-text="alertSuccess"></p>
+                </div>
+                <div class="ml-auto pl-3">
+                  <div class="-mx-1.5 -my-1.5">
+                    <button @click="alertSuccess=''"type="button" class="inline-flex bg-green-50 rounded-md p-1.5 text-green-500 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-green-50 focus:ring-green-600">
+                      <span class="sr-only">Dismiss</span>
+                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div x-cloak x-transition x-show="alertError" class="mb-5 rounded-md bg-red-50 p-3">
+              <div class="flex items-center">
+                <div class="ml-3">
+                  <p class="text-xs text-red-800" x-text="alertError"></p>
+                </div>
+                <div class="ml-auto pl-3">
+                  <div class="-mx-1.5 -my-1.5">
+                    <button @click="alertError=''" type="button" class="inline-flex bg-red-50 rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600">
+                      <span class="sr-only">Dismiss</span>
+                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-5">
+
+              <div class="border border-gray-200 rounded p-2">
+                <div class="flex items-center justify-between">
+                  <p class="text-xs text-gray-900 font-medium">SOCKS Forwarder</p>
+                  <template x-if="cache.forwarders_socks">
+                    <p class="text-xs" :class="cache.forwarders_socks.state == 'active' ? 'text-green-600' : 'text-gray-900'"  x-text="cache.forwarders_socks.state"></p>
+                  </template>
+                </div>
                 <template x-if="cache.forwarders_socks">
-                  <p class="text-xs" :class="cache.forwarders_socks.state == 'active' ? 'text-green-600' : 'text-gray-900'"  x-text="cache.forwarders_socks.state"></p>
+                  <div class="py-4">
+                    <div x-show="cache.forwarders_socks.binary.ok">
+                      <button @click="apiPostJson('/api/forwarders/socks/start')" :disabled="cache.forwarders_socks.state == 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">start</button>
+                      <button @click="apiPostJson('/api/forwarders/socks/stop')" :disabled="cache.forwarders_socks.state != 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">stop</button>
+                    </div>
+                    <div x-show="!cache.forwarders_socks.binary.ok" class="bg-red-200 p-2 mt-5 rounded text-xs">
+                      <ul>
+                        <li>binary.state.exists: <span x-text="cache.forwarders_socks.binary.state.exists"></span></li>
+                        <li>binary.state.chmod_x: <span x-text="cache.forwarders_socks.binary.state.chmod_x"></span></li>
+                      </ul>
+                    </div>
+                  </div>
                 </template>
               </div>
-              <template x-if="cache.forwarders_socks">
-                <div class="py-4">
-                  <div x-show="cache.forwarders_socks.binary.ok">
-                    <button @click="apiPostJson('/api/forwarders/socks/start')" :disabled="cache.forwarders_socks.state == 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">start</button>
-                    <button @click="apiPostJson('/api/forwarders/socks/stop')" :disabled="cache.forwarders_socks.state != 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">stop</button>
-                  </div>
-                  <div x-show="!cache.forwarders_socks.binary.ok" class="bg-red-200 p-2 mt-5 rounded text-xs">
-                    <ul>
-                      <li>binary.state.exists: <span x-text="cache.forwarders_socks.binary.state.exists"></span></li>
-                      <li>binary.state.chmod_x: <span x-text="cache.forwarders_socks.binary.state.chmod_x"></span></li>
-                    </ul>
-                  </div>
-                </div>
-              </template>
-            </div>
 
-            <div class="border border-gray-200 rounded p-2">
-              <div class="flex items-center justify-between">
-                <p class="text-xs text-gray-900 font-medium">TUN Forwarder</p>
+              <div class="border border-gray-200 rounded p-2">
+                <div class="flex items-center justify-between">
+                  <p class="text-xs text-gray-900 font-medium">TUN Forwarder</p>
+                  <template x-if="cache.forwarders_tun">
+                    <p class="text-xs" :class="cache.forwarders_tun.state == 'active' ? 'text-green-600' : 'text-gray-900'"  x-text="cache.forwarders_tun.state"></p>
+                  </template>
+                </div>
                 <template x-if="cache.forwarders_tun">
-                  <p class="text-xs" :class="cache.forwarders_tun.state == 'active' ? 'text-green-600' : 'text-gray-900'"  x-text="cache.forwarders_tun.state"></p>
+                  <div class="py-4">
+                    <div x-show="cache.forwarders_tun.binary.ok">
+                      <button @click="apiPostJson('/api/forwarders/tun/start')" :disabled="cache.forwarders_tun.state == 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">start</button>
+                      <button @click="apiPostJson('/api/forwarders/tun/stop')" :disabled="cache.forwarders_tun.state != 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">stop</button>
+                    </div>
+                    <div x-show="!cache.forwarders_tun.binary.ok" class="bg-red-200 p-2 mt-5 rounded text-xs">
+                      <ul>
+                        <li>binary.state.exists: <span x-text="cache.forwarders_tun.binary.state.exists"></span></li>
+                        <li>binary.state.chown_0: <span x-text="cache.forwarders_tun.binary.state.chown_0"></span></li>
+                        <li>binary.state.chmod_x: <span x-text="cache.forwarders_tun.binary.state.chmod_x"></span></li>
+                        <li>binary.state.chmod_us: <span x-text="cache.forwarders_tun.binary.state.chmod_us"></span></li>
+                      </ul>
+                    </div>
+                  </div>
                 </template>
               </div>
-              <template x-if="cache.forwarders_tun">
-                <div class="py-4">
-                  <div x-show="cache.forwarders_tun.binary.ok">
-                    <button @click="apiPostJson('/api/forwarders/tun/start')" :disabled="cache.forwarders_tun.state == 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">start</button>
-                    <button @click="apiPostJson('/api/forwarders/tun/stop')" :disabled="cache.forwarders_tun.state != 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">stop</button>
-                  </div>
-                  <div x-show="!cache.forwarders_tun.binary.ok" class="bg-red-200 p-2 mt-5 rounded text-xs">
-                    <ul>
-                      <li>binary.state.exists: <span x-text="cache.forwarders_tun.binary.state.exists"></span></li>
-                      <li>binary.state.chown_0: <span x-text="cache.forwarders_tun.binary.state.chown_0"></span></li>
-                      <li>binary.state.chmod_x: <span x-text="cache.forwarders_tun.binary.state.chmod_x"></span></li>
-                      <li>binary.state.chmod_us: <span x-text="cache.forwarders_tun.binary.state.chmod_us"></span></li>
-                    </ul>
-                  </div>
-                </div>
-              </template>
-            </div>
 
-            <div class="border border-gray-200 rounded p-2">
-              <div class="flex items-center justify-between">
-                <p class="text-xs text-gray-900 font-medium">Accesskeys</p>
-              </div>
-              <template x-if="cache.config">
-                <div class="py-4 space-y-2">
-                  <form class="w-full flex items-center text-xs space-x-2">
-                    <input type="checkbox" id="use_on_demand" @change="setConfigBrokerAccesskeyUseondemand($event.target.checked)" :checked="cache.config.broker.accesskey.use_on_demand">
-                    <label for="use_on_demand">use on demand (<span x-text="cache.config.broker.accesskey.use_on_demand"></span>)</label>
-                  </form>
-                  <!-- TODO: disabled - actually check if activation is needed and possible -->
-                  <button @click="apiPostJson('/api/accesskeys/activate')" :disabled="!cache.accesskeys" x-show="!cache.config.broker.accesskey.use_on_demand" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">activate accesskey</button>
+              <div class="border border-gray-200 rounded p-2">
+                <div class="flex items-center justify-between">
+                  <p class="text-xs text-gray-900 font-medium">Accesskeys</p>
                 </div>
-              </template>
-
-              <div class="w-full flex items-center text-xs space-x-2" x-data="{url: 'https://libre.wireleap.com/accesskeys'}">
-                <input type="url" x-model="url" class="border border-gray-200 rounded-md p-1.5 focus:ring-indigo-500 focus:border-indigo-500 block w-full">
-                <button @click="apiPostJson('/api/accesskeys/import', {'url': url})" :disabled="!url" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">import</button>
+                <template x-if="cache.config">
+                  <div class="py-4 space-y-2">
+                    <form class="w-full flex items-center text-xs space-x-2">
+                      <input type="checkbox" id="use_on_demand" @change="setConfigBrokerAccesskeyUseondemand($event.target.checked)" :checked="cache.config.broker.accesskey.use_on_demand">
+                      <label for="use_on_demand">use on demand (<span x-text="cache.config.broker.accesskey.use_on_demand"></span>)</label>
+                    </form>
+                    <!-- TODO: disabled - actually check if activation is needed and possible -->
+                    <button @click="apiPostJson('/api/accesskeys/activate')" :disabled="!cache.accesskeys" x-show="!cache.config.broker.accesskey.use_on_demand" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">activate accesskey</button>
+                  </div>
+                </template>
+                <div class="w-full flex items-center text-xs space-x-2" x-data="{url: 'https://libre.wireleap.com/accesskeys'}">
+                  <input type="url" x-model="url" class="border border-gray-200 rounded-md p-1.5 focus:ring-indigo-500 focus:border-indigo-500 block w-full">
+                  <button @click="apiPostJson('/api/accesskeys/import', {'url': url})" :disabled="!url" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">import</button>
+                </div>
               </div>
 
             </div>
@@ -334,6 +375,8 @@ function alpineInstance() {
   return {
     cache: {},
     error: {},
+    alertSuccess: '',
+    alertError: '',
     initialize() {
       this.refresh();
     },
@@ -386,9 +429,16 @@ function alpineInstance() {
             this.apiGetText("/api/log");
           }
 
-          if (uri.startsWith("/api/accesskeys")) {
+          if (uri.startsWith("/api/accesskeys/import")) {
             //TODO: returns raw json file contents, not list of accesskey objects
             //this.cache.accesskeys = data; // append to existing
+            this.alertSuccess = "successfully imported accesskeys";
+            this.apiGetJson("/api/accesskeys");
+            this.apiGetText("/api/log");
+          }
+
+          if (uri.startsWith("/api/accesskeys/activate")) {
+            this.alertSuccess = "successfully activated accesskey";
             this.apiGetJson("/api/accesskeys");
             this.apiGetText("/api/log");
           }
@@ -399,6 +449,7 @@ function alpineInstance() {
         })
         .catch(error => {
           console.log(error);
+          error.text().then(data => this.alertError = data);
           //this.cache[cacheKey] = null;
           //error.text().then(data => this.error[cacheKey] = data );
         })
