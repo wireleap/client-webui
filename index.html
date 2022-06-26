@@ -391,13 +391,10 @@
 
                 <template x-if="cache.config">
                   <div class="text-xs py-3">
-
                     <p>hops: <span x-text="cache.config.broker.circuit.hops"></span></p>
                     <template x-for="hops in [1, 2, 3]">
                       <button @click="apiPostJson('/api/config', {'broker': {'circuit': {'hops': hops}}})" :class="cache.config.broker.circuit.hops == hops ? 'bg-blue-200' : ''" x-text="hops" class="w-24 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-blue-300 mr-3"></button>
                     </template>
-
-                    <p class="py-3">whitelist: <span x-text="cache.config.broker.circuit.whitelist"></span></p>
                   </div>
                 </template>
 
@@ -431,6 +428,38 @@
                     </template>
                   </ul>
                 </template>
+
+                <template x-if="cache.config">
+                  <template x-if="cache.relays">
+                    <div class="text-xs py-3">
+
+
+                      <div x-data="{whitelist: cache.config.broker.circuit.whitelist, whitelist_enabled: cache.config.broker.circuit.whitelist.length > 0}">
+                        <ul>
+                          <p class="py-3">circuit.whitelist: <span x-text="cache.config.broker.circuit.whitelist"></span></p>
+                          <p class="py-3">whitelist: <span x-text="whitelist"></span></p>
+
+                          <div class="flex py-4 space-y-2 items-center justify-between">
+                            <form class="w-full flex items-center text-xs space-x-3">
+                              <input type="checkbox" id="whitelist_enabled" @change="if ($event.target.checked) { whitelist=cache.config.broker.circuit.whitelist} else { whitelist=[] }" x-model="whitelist_enabled">
+                              <label for="whitelist_enabled">enable whitelist (<span x-text="whitelist_enabled"></span>)</label>
+                            </form>
+                            <button @click="apiPostJson('/api/config', {'broker': {'circuit': {'whitelist': whitelist}}}); whitelist_enabled = whitelist.length > 0" class="whitespace-nowrap disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">apply</button>
+                          </div>
+
+                          <template x-for="relay in filterBy(cache.relays, 'role', 'backing')">
+                            <li>
+                              <input :disabled="!whitelist_enabled" type="checkbox" :value="relay.address" x-model="whitelist">
+                              <span class="font-medium text-xs leading-6 pl-1 pr-2" x-text="relay.address"></span>
+                            </li>
+                          </template>
+                        </ul>
+                        
+                      </div>
+                    </div>
+                  </template>
+                </template>
+
 
 
 
