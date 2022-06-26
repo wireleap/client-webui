@@ -432,13 +432,8 @@
                 <template x-if="cache.config">
                   <template x-if="cache.relays">
                     <div class="text-xs py-3">
-
-
                       <div x-data="{whitelist: cache.config.broker.circuit.whitelist, whitelist_enabled: cache.config.broker.circuit.whitelist.length > 0}">
-                        <ul>
-                          <p class="py-3">circuit.whitelist: <span x-text="cache.config.broker.circuit.whitelist"></span></p>
-                          <p class="py-3">whitelist: <span x-text="whitelist"></span></p>
-
+                        <ul role="list" class="mt-3 divide-y divide-gray-100 text-xs">
                           <div class="flex py-4 space-y-2 items-center justify-between">
                             <form class="w-full flex items-center text-xs space-x-3">
                               <input type="checkbox" id="whitelist_enabled" @change="if ($event.target.checked) { whitelist=cache.config.broker.circuit.whitelist} else { whitelist=[] }" x-model="whitelist_enabled">
@@ -447,53 +442,46 @@
                             <button @click="apiPostJson('/api/config', {'broker': {'circuit': {'whitelist': whitelist}}}); whitelist_enabled = whitelist.length > 0" class="whitespace-nowrap disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">apply</button>
                           </div>
 
+                          <template x-for="relay in filterBy(cache.relays, 'role', 'fronting')">
+                            <li class="group flex items-center justify-between py-2">
+                              <div class="flex-1 items-center">
+                                <input :disabled="!whitelist_enabled" type="checkbox" :value="relay.address" x-model="whitelist">
+                                <span class="font-medium text-xs leading-6 pl-1 pr-2" x-text="relay.role"></span>
+                                <span class="font-normal text-gray-500" x-text="relay.address"></span>
+                              </div>
+                              <span x-text="relay.versions.software"></span>
+                            </li>
+                          </template>
+
+                          <template x-for="relay in filterBy(cache.relays, 'role', 'entropic')">
+                            <li class="group flex items-center justify-between py-2">
+                              <div class="flex-1 items-center">
+                                <input :disabled="!whitelist_enabled" type="checkbox" :value="relay.address" x-model="whitelist">
+                                <span class="font-medium text-xs leading-6 pl-1 pr-2" x-text="relay.role"></span>
+                                <span class="font-normal text-gray-500" x-text="relay.address"></span>
+                              </div>
+                              <span x-text="relay.versions.software"></span>
+                            </li>
+                          </template>
+
                           <template x-for="relay in filterBy(cache.relays, 'role', 'backing')">
-                            <li>
-                              <input :disabled="!whitelist_enabled" type="checkbox" :value="relay.address" x-model="whitelist">
-                              <span class="font-medium text-xs leading-6 pl-1 pr-2" x-text="relay.address"></span>
+                            <li class="group flex items-center justify-between py-2">
+                              <div class="flex-1 items-center">
+                                <input :disabled="!whitelist_enabled" type="checkbox" :value="relay.address" x-model="whitelist">
+                                <span class="font-medium text-xs leading-6 pl-1 pr-2" x-text="relay.role"></span>
+                                <span class="font-normal text-gray-500" x-text="relay.address"></span>
+                              </div>
+                              <span x-text="relay.versions.software"></span>
                             </li>
                           </template>
                         </ul>
-                        
+                        <p class="py-1">circuit.whitelist: <span x-text="cache.config.broker.circuit.whitelist"></span></p>
+                        <p class="py-1">whitelist: <span x-text="whitelist"></span></p>
                       </div>
                     </div>
                   </template>
                 </template>
 
-
-
-
-                <template x-if="cache.relays">
-                  <ul role="list" class="mt-3 divide-y divide-gray-100 text-xs">
-                    <template x-for="relay in filterBy(cache.relays, 'role', 'fronting')">
-                      <li class="group flex items-center justify-between py-2">
-                        <div class="flex-1 items-center">
-                          <span class="font-medium text-xs leading-6 pl-1 pr-2" x-text="relay.role"></span>
-                          <span class="font-normal text-gray-500" x-text="relay.address"></span>
-                        </div>
-                        <span x-text="relay.versions.software"></span>
-                      </li>
-                    </template>
-                    <template x-for="relay in filterBy(cache.relays, 'role', 'entropic')">
-                      <li class="group flex items-center justify-between py-2">
-                        <div class="flex-1 items-center">
-                          <span class="font-medium text-xs leading-6 pl-1 pr-2" x-text="relay.role"></span>
-                          <span class="font-normal text-gray-500" x-text="relay.address"></span>
-                        </div>
-                        <span x-text="relay.versions.software"></span>
-                      </li>
-                    </template>
-                    <template x-for="relay in filterBy(cache.relays, 'role', 'backing')">
-                      <li class="group flex items-center justify-between py-2">
-                        <div class="flex-1 items-center">
-                          <span class="font-medium text-xs leading-6 pl-1 pr-2" x-text="relay.role"></span>
-                          <span class="font-normal text-gray-500" x-text="relay.address"></span>
-                        </div>
-                        <span x-text="relay.versions.software"></span>
-                      </li>
-                    </template>
-                  </ul>
-                </template>
               </div>
 
             </div>
