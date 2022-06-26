@@ -27,14 +27,25 @@
 </head>
 
 <body>
+
 <div x-data="alpineInstance()" x-init="initialize()">
 
+<div x-show="breakpoints">
+  <div class="flex items-center justify-center fixed top-0 right-0 mt-8 mr-8 z-50 w-8 h-8 rounded-full text-gray-700 text-sm uppercase bg-gray-200 sm:bg-yellow-200 md:bg-green-200 lg:bg-purple-200 xl:bg-red-200">
+    <span class="block sm:hidden">all</span>
+    <span class="hidden sm:block md:hidden">sm</span>
+    <span class="hidden md:block lg:hidden">md</span>
+    <span class="hidden lg:block xl:hidden">lg</span>
+    <span class="hidden xl:block">xl</span>
+  </div>
+</div>
+
 <div class="relative min-h-screen flex flex-col">
-  <div class="flex-grow w-full mx-auto lg:flex">
+  <div class="flex-grow w-full mx-auto md:flex">
 
     <div class="flex-1 min-w-0 bg-white xl:flex">
       <!-- left column -->
-      <div class="lg:w-1/3 border-b border-gray-200 xl:border-b-0 xl:flex-shrink-0 xl:border-r xl:border-gray-200 bg-white">
+      <div class="hidden xl:block w-1/3 border-b border-gray-200 border-b-0 flex-shrink-0 border-r border-gray-200 bg-white">
         <div class="h-full p-6">
           <div class="h-full relative space-y-3 scroll-container overflow-y-auto overflow-hidden pb-10" style="min-height: 12rem">
 
@@ -209,7 +220,7 @@
       </div>
 
       <!-- main area -->
-      <div class="bg-white lg:min-w-0 lg:flex-1">
+      <div class="bg-white min-w-0">
         <div class="h-full p-6">
           <!-- Start main area-->
           <div class="relative h-screen" style="min-height: 36rem">
@@ -494,7 +505,7 @@
     </div>
 
     <!-- right column -->
-    <div class="lg:w-1/3 bg-gray-50 lg:flex-shrink-0 lg:border-l lg:border-gray-200">
+    <div class="w-1/3 flex-shrink-0 border-l border-gray-200 bg-gray-50 ">
       <div class="h-full p-6 lg:w-full">
         <div class="relative space-y-5" style="min-height: 16rem">
           <div>
@@ -539,6 +550,7 @@
 <script type="text/javascript">
 function alpineInstance() {
   return {
+    breakpoints: true,
     cache: {},
     error: {},
     alertSuccess: '',
