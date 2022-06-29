@@ -7,6 +7,7 @@
   <title>wireleap</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.9.1/dist/cdn.min.js"></script>
+  <link id="favicon" rel="shortcut icon" href="">
   <style>
     [x-cloak] {
       display: none !important;
@@ -648,11 +649,18 @@ function alpineInstance() {
     },
     running() {
       if (this.cache.forwarders_socks) {
-        if (this.cache.forwarders_socks.state == 'active') return true;
+        if (this.cache.forwarders_socks.state == 'active') {
+          this.updateFavicon(true)
+          return true;
+        }
       }
       if (this.cache.forwarders_tun) {
-        if (this.cache.forwarders_tun.state == 'active') return true;
+        if (this.cache.forwarders_tun.state == 'active') {
+          this.updateFavicon(true)
+          return true;
+        }
       }
+      this.updateFavicon(false)
       return false;
     },
     apiPostJson(uri, data={}) {
@@ -774,6 +782,12 @@ function alpineInstance() {
       now_unix = Math.floor(now.getTime() / 1000);
       seconds = timestamp - now_unix;
       return this.timeLeft(seconds)
+    },
+    updateFavicon(active) {
+      const iconActive = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='100' width='100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%2322c55e' /%3E%3C/svg%3E%0A"
+      const iconInActive = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='100' width='100'%3E%3Ccircle cx='50' cy='50' r='40' fill='gray' /%3E%3C/svg%3E%0A"
+      const favicon = document.getElementById("favicon");
+      favicon.href = active ? iconActive : iconInActive;
     },
 
   }
