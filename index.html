@@ -379,20 +379,22 @@
                   </form>
                   <button @click="apiPostJson('/api/config', {'broker': {'circuit': {'whitelist': whitelist}}}); whitelist_enabled = whitelist.length > 0" class="whitespace-nowrap disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">apply</button>
                 </div>
-                <ul role="list" class="mt-1 divide-y divide-gray-100 text-xs">
-                  <template x-for="role in ['backing', 'entropic', 'fronting']">
-                    <template x-for="relay in filterBy(cache.relays, 'role', role)">
-                      <li class="group flex items-center justify-between py-2">
-                        <div class="flex items-center justify-between space-x-3">
-                          <input :disabled="!whitelist_enabled" type="checkbox" :value="relay.address" x-model="whitelist">
-                          <span class="font-medium text-xs leading-6" x-text="relay.role"></span>
-                          <span class="font-normal text-gray-500" x-text="relay.address"></span>
-                        </div>
-                        <span x-text="relay.versions.software"></span>
-                      </li>
-                    </template>
-                  </template>
-                </ul>
+                <template x-for="role in ['fronting', 'entropic', 'backing']" :key="role">
+                  <div class="space-y-3">
+                    <h3 class="py-1 mt-3 border-b border-gray-300" x-text="role"></h3>
+                    <ul role="list" class="mt-1 text-xs">
+                      <template x-for="relay in filterBy(cache.relays, 'role', role)" :key="relay.address">
+                        <li class="group flex items-center justify-between py-2 border-b border-gray-100">
+                          <div class="flex items-center justify-between space-x-3">
+                            <input :disabled="!whitelist_enabled" type="checkbox" :value="relay.address" x-model="whitelist">
+                            <span class="font-normal text-gray-700" x-text="relay.address"></span>
+                          </div>
+                          <span x-text="relay.versions.software"></span>
+                        </li>
+                      </template>
+                    </ul>
+                  </div>
+                </template>
                 <!--
                 <p class="py-1">circuit.whitelist: <span x-text="cache.config.broker.circuit.whitelist"></span></p>
                 <p class="py-1">whitelist: <span x-text="whitelist"></span></p>
@@ -616,7 +618,7 @@
 <script type="text/javascript">
 function alpineInstance() {
   return {
-    currentTab: location.hash.replace('#','') || 'logs',
+    currentTab: location.hash.replace('#','') || 'accesskeys',
     alertError: '',
     waiting: [],
     cache: {},
