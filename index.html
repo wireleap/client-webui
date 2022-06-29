@@ -81,22 +81,32 @@
               </button>
             </div>
           </template>
-          <div x-cloak x-transition x-show="showErrors" class="my-5 rounded-sm bg-red-200 py-3 pr-3 pl-1">
-            <div class="flex items-center">
-              <ul class="ml-3 text-xs text-red-800">
-                <li>binary.state.exists: <span x-text="cache.forwarders_socks.binary.state.exists"></span></li>
-                <li>binary.state.chmod_x: <span x-text="cache.forwarders_socks.binary.state.chmod_x"></span></li>
-              </ul>
-              <div class="ml-auto pl-3">
-                <div class="-mx-1.5 -my-1.5">
-                  <button @click="showErrors=!showErrors" type="button" class="inline-flex bg-red-200 rounded-md p-1.5 text-red-500 hover:bg-red-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600">
-                    <span class="sr-only">Dismiss</span>
-                    <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                  </button>
+          <div x-cloak x-transition x-show="showErrors" class="m-3 py-3 pl-1 rounded-sm bg-red-200 relative">
+            <div class="absolute top-0 right-0 pt-2 pr-2">
+              <button @click="showErrors=!showErrors" type="button" class="inline-flex bg-red-200 rounded-md p-1.5 text-red-500 hover:bg-red-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600">
+                <span class="sr-only">Dismiss</span>
+                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            </div>
+            <div class="text-sm ml-3">
+              <template x-if="!cache.forwarders_socks.binary.state.exists">
+                <div class="text-red-800">
+                  <p class="w-full pb-1">SOCKS binary does not exist</p>
                 </div>
-              </div>
+              </template>
+              <template x-if="cache.forwarders_socks.binary.state.exists">
+                <div class="text-red-800">
+                  <p class="w-full pb-1">SOCKS permissions are not configured</p>
+                  <div class="font-mono whitespace-nowrap rounded-md mt-2 py-2">
+                    <p x-text="'cd '+ cache.status.home"></p>
+                    <template x-if="!cache.forwarders_socks.binary.state.chmod_x">
+                      <p>chmod +x wireleap_socks</p>
+                    </template>
+                  </div>
+                </div>
+              </template>
             </div>
           </div>
         </div>
@@ -132,29 +142,42 @@
               </button>
             </div>
           </template>
-          <div x-cloak x-transition x-show="showErrors" class="my-5 rounded-sm bg-red-200 py-3 pr-3 pl-1">
-            <div class="flex items-center">
-              <ul class="ml-3 text-xs text-red-800">
-                <li>binary.state.exists: <span x-text="cache.forwarders_tun.binary.state.exists"></span></li>
-                <li>binary.state.chown_0: <span x-text="cache.forwarders_tun.binary.state.chown_0"></span></li>
-                <li>binary.state.chmod_x: <span x-text="cache.forwarders_tun.binary.state.chmod_x"></span></li>
-                <li>binary.state.chmod_us: <span x-text="cache.forwarders_tun.binary.state.chmod_us"></span></li>
-              </ul>
-              <div class="ml-auto pl-3">
-                <div class="-mx-1.5 -my-1.5">
-                  <button @click="showErrors=!showErrors" type="button" class="inline-flex bg-red-200 rounded-md p-1.5 text-red-500 hover:bg-red-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600">
-                    <span class="sr-only">Dismiss</span>
-                    <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                  </button>
+          <div x-cloak x-transition x-show="showErrors" class="m-3 py-3 pl-1 rounded-sm bg-red-200 relative">
+            <div class="absolute top-0 right-0 pt-2 pr-2">
+              <button @click="showErrors=!showErrors" type="button" class="inline-flex bg-red-200 rounded-md p-1.5 text-red-500 hover:bg-red-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600">
+                <span class="sr-only">Dismiss</span>
+                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </button>
+            </div>
+            <div class="text-sm ml-3">
+              <template x-if="!cache.forwarders_tun.binary.state.exists">
+                <div class="text-red-800">
+                  <p class="w-full pb-1">TUN binary does not exist</p>
                 </div>
-              </div>
+              </template>
+              <template x-if="cache.forwarders_tun.binary.state.exists">
+                <div class="text-red-800">
+                  <p class="w-full pb-1">TUN permissions are not configured</p>
+                  <div class="font-mono whitespace-nowrap rounded-md mt-2 py-2">
+                    <p x-text="'cd '+ cache.status.home"></p>
+                    <template x-if="!cache.forwarders_tun.binary.state.chmod_x">
+                      <p>chmod +x wireleap_tun</p>
+                    </template>
+                    <template x-if="!cache.forwarders_tun.binary.state.chown_0">
+                      <p>sudo chown 0:0 wireleap_tun</p>
+                    </template>
+                    <template x-if="!cache.forwarders_tun.binary.state.chmod_us">
+                      <p>sudo chmod u+s wireleap_tun</p>
+                    </template>
+                  </div>
+                </div>
+              </template>
             </div>
           </div>
         </div>
       </template>
-
     </div>
 
     <!-- main:circuit -->
@@ -387,11 +410,15 @@
                 <input class="w-full mt-4 px-2 py-2 border focus:border-blue-300 ring-blue-300 focus:ring focus:outline-none rounded-md"
                        type="text" placeholder="filter..." x-model="filter" x-ref="filter"
                        @keyup.slash.window="$nextTick(() => $refs.filter.focus());"
-                       @keyup.escape.window="search = ''; $nextTick(() => $refs.filter.blur());"
+                       @keyup.escape.window="filter = ''; $nextTick(() => $refs.filter.blur());"
                        />
                 <template x-for="role in ['fronting', 'entropic', 'backing']" :key="role">
                   <div class="space-y-3">
-                    <h3 class="py-1 mt-3 border-b border-gray-300" x-text="role"></h3>
+                    <h3 class="py-1 mt-3 border-b border-gray-300">
+                      <span x-text="role"></span>
+                      (<span x-text="filterBy(cache.relays, 'role', role).length"></span>)
+                    </h3>
+
                     <ul role="list" class="mt-1 text-xs">
                       <template x-for="relay in filterBy(filterRelays(), 'role', role)" :key="relay.address">
                         <li class="group flex items-center justify-between py-2 border-b border-gray-100">
