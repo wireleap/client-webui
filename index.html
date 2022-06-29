@@ -27,517 +27,582 @@
 </head>
 
 <body>
-
 <div x-data="alpineInstance()" x-init="initialize()">
 
-<div x-show="breakpoints">
-  <div class="flex items-center justify-center fixed top-0 right-0 mt-8 mr-8 z-50 w-8 h-8 rounded-full text-gray-700 text-sm uppercase bg-gray-200 sm:bg-yellow-200 md:bg-green-200 lg:bg-purple-200 xl:bg-red-200">
-    <span class="block sm:hidden">all</span>
-    <span class="hidden sm:block md:hidden">sm</span>
-    <span class="hidden md:block lg:hidden">md</span>
-    <span class="hidden lg:block xl:hidden">lg</span>
-    <span class="hidden xl:block">xl</span>
-  </div>
-</div>
+<div class="flex h-screen">
+  <main class="flex-col min-w-[500px] bg-gray-700 overflow-y-auto scroll-container">
+    <!-- navbar -->
+    <div :class="running() ? 'bg-green-500' : 'bg-gray-600'" class="flex items-center justify-between p-4" x-model="running">
+      <button class="text-white focus:outline-none rounded-full -m-2 p-1 hover:bg-white hover:bg-opacity-25 transition duration-300">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+      <span class="text-md text-white" x-text="waiting.length > 0 ? waiting.at(-1) : 'wireleap'"></span>
+      <button @click="refresh()" title="refresh" class="text-white focus:outline-none rounded-full -my-2 -mx-1 p-1 hover:bg-white hover:bg-opacity-25 transition duration-300">
+        <svg xmlns="http://www.w3.org/2000/svg" :class="[ waiting.length > 0 ? 'animate-spin' : '' ]" class="h-5 w-5" viewBox="0 0 1024 1024" fill="currentColor">
+          <path d="M909.1 209.3l-56.4 44.1C775.8 155.1 656.2 92 521.9 92 290 92 102.3 279.5 102 511.5 101.7 743.7 289.8 932 521.9 932c181.3 0 335.8-115 394.6-276.1 1.5-4.2-.7-8.9-4.9-10.3l-56.7-19.5a8 8 0 00-10.1 4.8c-1.8 5-3.8 10-5.9 14.9-17.3 41-42.1 77.8-73.7 109.4A344.77 344.77 0 01655.9 829c-42.3 17.9-87.4 27-133.8 27-46.5 0-91.5-9.1-133.8-27A341.5 341.5 0 01279 755.2a342.16 342.16 0 01-73.7-109.4c-17.9-42.4-27-87.4-27-133.9s9.1-91.5 27-133.9c17.3-41 42.1-77.8 73.7-109.4 31.6-31.6 68.4-56.4 109.3-73.8 42.3-17.9 87.4-27 133.8-27 46.5 0 91.5 9.1 133.8 27a341.5 341.5 0 01109.3 73.8c9.9 9.9 19.2 20.4 27.8 31.4l-60.2 47a8 8 0 003 14.1l175.6 43c5 1.2 9.9-2.6 9.9-7.7l.8-180.9c-.1-6.6-7.8-10.3-13-6.2z" />
+        </svg>
+      </button>
+    </div>
 
-<div class="relative min-h-screen flex flex-col">
-  <div class="flex-grow w-full mx-auto md:flex">
+    <!-- main:forwarders -->
+    <p class="text-gray-300 text-sm uppercase mt-12 mx-4">Forwarders</p>
+    <div class="m-4 divide-y divide-gray-600">
 
-    <div class="flex-1 min-w-0 bg-white xl:flex">
-      <!-- left column -->
-      <div class="hidden xl:block xl:w-1/3 border-b border-gray-200 border-b-0 flex-shrink-0 border-r border-gray-200 bg-white">
-        <div class="h-full p-6">
-          <div class="h-full relative space-y-3 scroll-container overflow-y-auto overflow-hidden pb-10" style="min-height: 12rem">
-
-            <a class="text-xs text-blue-600" href="http://alonswartz-temp.s3-website-us-east-1.amazonaws.com/wireleap.com/docs/client-api/" target="_blank">API Spec</a>
-
-            <p class="text-xs text-gray-900 font-medium uppercase pb-2 pt-4">Core</p>
-
-            <details class="text-xs whitespace-nowrap cursor-pointer">
-              <summary class="text-gray-600 font-light">version</summary>
-              <template x-if="error.version"><p class="p-1 bg-red-200" x-text="error.version"></template>
-              <template x-if="cache.version">
-                <ul class="ml-1 p-2 border-l-2 border-blue-200">
-                  <li>version: <span x-text="cache.version.version"></span></li>
-                </ul>
-              </template>
-            </details>
-
-            <details class="text-xs whitespace-nowrap cursor-pointer">
-              <summary class="text-gray-600 font-light">status</summary>
-              <template x-if="error.status"><p class="p-1 bg-red-200" x-text="error.status"></template>
-              <template x-if="cache.status">
-                <ul class="ml-1 p-2 border-l-2 border-blue-200">
-                  <li>home: <span x-text="cache.status.home"></span></li>
-                  <li>pid: <span x-text="cache.status.pid"></span></li>
-                  <li>state: <span x-text="cache.status.state"></span></li>
-                  <li>broker.active_circuit: <span x-text="cache.status.broker.active_circuit"></span></li>
-                  <li>upgrade.required: <span x-text="cache.status.upgrade.required"></span></li>
-                </ul>
-              </template>
-            </details>
-
-            <details class="text-xs whitespace-nowrap cursor-pointer">
-              <summary class="text-gray-600 font-light">config</summary>
-              <template x-if="error.config"><p class="p-1 bg-red-200" x-text="error.config"></template>
-              <template x-if="cache.config">
-                <ul class="ml-1 p-2 border-l-2 border-blue-200">
-                  <li>address: <span x-text="cache.config.address"></span></li>
-                  <li>broker.address: <span x-text="cache.config.broker.address"></span></li>
-                  <li>broker.accesskey.use_on_demand: <span x-text="cache.config.broker.accesskey.use_on_demand"></span></li>
-                  <li>broker.circuit.timeout: <span x-text="cache.config.broker.circuit.timeout"></span></li>
-                  <li>broker.circuit.hops: <span x-text="cache.config.broker.circuit.hops"></span></li>
-                  <li>broker.circuit.whitelist: <span x-text="cache.config.broker.circuit.whitelist"></span></li>
-                  <li>forwarders.socks.address: <span x-text="cache.config.forwarders.socks.address"></span></li>
-                  <li>forwarders.tun.address: <span x-text="cache.config.forwarders.tun.address"></span></li>
-                </ul>
-              </template>
-            </details>
-
-            <details class="text-xs whitespace-nowrap cursor-pointer">
-              <summary class="text-gray-600 font-light">runtime</summary>
-              <template x-if="error.runtime"><p class="p-1 bg-red-200" x-text="error.runtime"></template>
-              <template x-if="cache.runtime">
-                <ul class="ml-1 p-2 border-l-2 border-blue-200">
-                  <li>versions.software: <span x-text="cache.runtime.versions.software"></span></li>
-                  <li>versions.api: <span x-text="cache.runtime.versions.api"></span></li>
-                  <li>versions.client-contract: <span x-text="cache.runtime.versions['client-contract']"></span></li>
-                  <li>versions.client-dir: <span x-text="cache.runtime.versions['client-dir']"></span></li>
-                  <li>versions.client-relay: <span x-text="cache.runtime.versions['client-relay']"></span></li>
-                  <li>upgrade.supported: <span x-text="cache.runtime.upgrade.supported"></span></li>
-                  <li>build.gitcommit: <span x-text="cache.runtime.build.gitcommit"></span></li>
-                  <li>build.goversion: <span x-text="cache.runtime.build.goversion"></span></li>
-                  <li>build.time: <span x-text="cache.runtime.build.time"></span></li>
-                  <li>build.flags: <span x-text="cache.runtime.build.flags"></span></li>
-                  <li>platform.os: <span x-text="cache.runtime.platform.os"></span></li>
-                  <li>platform.arch: <span x-text="cache.runtime.platform.arch"></span></li>
-                </ul>
-              </template>
-            </details>
-
-            <p class="text-xs text-gray-900 font-medium uppercase pb-2 pt-4">Resources</p>
-
-            <details class="text-xs whitespace-nowrap cursor-pointer">
-              <summary class="text-gray-600 font-light">accesskeys</summary>
-              <template x-if="error.accesskeys"><p class="p-1 bg-red-200" x-text="error.accesskeys"></template>
-              <template x-if="cache.accesskeys">
-                <template x-for="accesskey in cache.accesskeys">
-                  <ul class="ml-1 p-2 border-l-2 border-blue-200">
-                    <li>contract: <span x-text="accesskey.contract"></span></li>
-                    <li>duration: <span x-text="accesskey.duration"></span></li>
-                    <li>expiration: <span x-text="accesskey.expiration"></span></li>
-                    <li>state: <span x-text="accesskey.state"></span></li>
-                  </ul>
-                </template>
-              </template>
-            </details>
-
-            <details class="text-xs whitespace-nowrap cursor-pointer">
-              <summary class="text-gray-600 font-light">relays</summary>
-              <template x-if="error.relays"><p class="p-1 bg-red-200" x-text="error.relays"></template>
-              <template x-if="cache.relays">
-                <template x-for="relay in cache.relays">
-                  <ul class="ml-1 p-2 border-l-2 border-blue-200">
-                    <li>role: <span x-text="relay.role"></span></li>
-                    <li>address: <span x-text="relay.address"></span></li>
-                    <li>pubkey: <span x-text="relay.pubkey"></span></li>
-                    <li>selectable: <span x-text="relay.selectable"></span></li>
-                    <li>versions.software: <span x-text="relay.versions.software"></span></li>
-                    <li>versions.client-relay: <span x-text="relay.versions['client-relay']"></span></li>
-                  </ul>
-                </template>
-              </template>
-            </details>
-
-            <details class="text-xs whitespace-nowrap cursor-pointer">
-              <summary class="text-gray-600 font-light">contract</summary>
-              <template x-if="error.contract"><p class="p-1 bg-red-200" x-text="error.contract"></template>
-              <template x-if="cache.contract">
-                <ul class="ml-1 p-2 border-l-2 border-blue-200">
-                  <li>pubkey: <span x-text="cache.contract.pubkey"></span></li>
-                  <li>version: <span x-text="cache.contract.version"></span></li>
-                  <li>endpoint: <span x-text="cache.contract.endpoint"></span></li>
-                  <template x-for="proof_of_funding in cache.contract.proof_of_funding">
-                    <ul class="py-2">
-                      <li>proof_of_funding.type: <span x-text="proof_of_funding.type"></span></li>
-                      <li>proof_of_funding.endpoint: <span x-text="proof_of_funding.endpoint"></span></li>
-                      <li>proof_of_funding.pubkey: <span x-text="proof_of_funding.pubkey"></span></li>
-                    </ul>
-                  </template>
-                  <li>servicekey.duration: <span x-text="cache.contract.servicekey.duration"></span></li>
-                  <li>servicekey.currency: <span x-text="cache.contract.servicekey.currency"></span></li>
-                  <li>servicekey.value: <span x-text="cache.contract.servicekey.value"></span></li>
-                  <li>directory.endpoint: <span x-text="cache.contract.directory.endpoint"></span></li>
-                  <li>directory.public_key: <span x-text="cache.contract.directory.public_key"></span></li>
-                  <li>metadata.operator: <span x-text="cache.contract.metadata.operator"></span></li>
-                  <li>metadata.operator_url: <span x-text="cache.contract.metadata.operator_url"></span></li>
-                  <li>metadata.name: <span x-text="cache.contract.metadata.name"></span></li>
-                  <li>metadata.terms_of_service: <span x-text="cache.contract.metadata.terms_of_service"></span></li>
-                  <li>metadata.privacy_policy: <span x-text="cache.contract.metadata.privacy_policy"></span></li>
-                </ul>
-              </template>
-            </details>
-
-            <p class="text-xs text-gray-900 font-medium uppercase pb-2 pt-4">Forwarders</p>
-
-            <details class="text-xs whitespace-nowrap cursor-pointer">
-              <summary class="text-gray-600 font-light">socks</summary>
-              <template x-if="error.forwarders_socks"><p class="p-1 bg-red-200" x-text="error.forwarders_socks"></template>
-              <template x-if="cache.forwarders_socks">
-                <ul class="ml-1 p-2 border-l-2 border-blue-200">
-                  <li>pid: <span x-text="cache.forwarders_socks.pid"></span></li>
-                  <li>state: <span x-text="cache.forwarders_socks.state"></span></li>
-                  <li>address: <span x-text="cache.forwarders_socks.address"></span></li>
-                  <li>binary.ok: <span x-text="cache.forwarders_socks.binary.ok"></span></li>
-                  <li>binary.state.exists: <span x-text="cache.forwarders_socks.binary.state.exists"></span></li>
-                  <li>binary.state.chmod_x: <span x-text="cache.forwarders_socks.binary.state.chmod_x"></span></li>
-                </ul>
-              </template>
-            </details>
-
-            <details class="text-xs whitespace-nowrap cursor-pointer">
-              <summary class="text-gray-600 font-light">tun</summary>
-              <template x-if="error.forwarders_tun"><p class="p-1 bg-red-200" x-text="error.forwarders_tun"></template>
-              <template x-if="cache.forwarders_tun">
-                <ul class="ml-1 p-2 border-l-2 border-blue-200">
-                  <li>pid: <span x-text="cache.forwarders_tun.pid"></span></li>
-                  <li>state: <span x-text="cache.forwarders_tun.state"></span></li>
-                  <li>address: <span x-text="cache.forwarders_tun.address"></span></li>
-                  <li>binary.ok: <span x-text="cache.forwarders_tun.binary.ok"></span></li>
-                  <li>binary.state.exists: <span x-text="cache.forwarders_tun.binary.state.exists"></span></li>
-                  <li>binary.state.chown_0: <span x-text="cache.forwarders_tun.binary.state.chown_0"></span></li>
-                  <li>binary.state.chmod_x: <span x-text="cache.forwarders_tun.binary.state.chmod_x"></span></li>
-                  <li>binary.state.chmod_us: <span x-text="cache.forwarders_tun.binary.state.chmod_us"></span></li>
-                </ul>
-              </template>
-            </details>
-
+      <!-- main:forwarders:socks -->
+      <template x-if="cache.forwarders_socks">
+        <div x-data="{showErrors: false}" class="py-2">
+          <template x-if="cache.forwarders_socks.binary.ok">
+            <div @click="cache.forwarders_socks.state == 'active' ? apiPostJson('/api/forwarders/socks/stop') : apiPostJson('/api/forwarders/socks/start')"
+                class="cursor-pointer flex justify-between items-center px-4 py-3 hover:bg-gray-600 hover:bg-opacity-75 transition duration-300 rounded">
+              <span class="flex-grow flex flex-col">
+                <span class="text-sm font-medium text-gray-300">SOCKSv5 forwarder</span>
+                <span class="text-sm text-gray-50">Tunnel specific traffic (manually or via exec scripts)</span>
+              </span>
+              <button type="button"
+                :class="cache.forwarders_socks.state == 'active' ? 'bg-green-500' : 'bg-gray-400'"
+                class="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" role="switch" aria-checked="false">
+                <span aria-hidden="true" :class="cache.forwarders_socks.state == 'active' ? 'translate-x-5' : 'translate-x-0'" class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"></span>
+              </button>
+            </div>
+          </template>
+          <template x-if="!cache.forwarders_socks.binary.ok">
+            <div @click="showErrors=!showErrors"
+                class="cursor-pointer flex justify-between items-center px-4 py-3 hover:bg-gray-600 hover:bg-opacity-75 transition duration-300 rounded">
+              <span class="flex-grow flex flex-col">
+                <span class="text-sm font-medium text-gray-300">SOCKSv5 forwarder</span>
+                <span class="text-sm text-gray-50">Tunnel specific traffic (manually or via exec scripts)</span>
+              </span>
+              <button type="button"
+                class="bg-gray-400 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" role="switch" aria-checked="false">
+                <span aria-hidden="true" class="translate-x-0 pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"></span>
+              </button>
+            </div>
+          </template>
+          <div x-cloak x-transition x-show="showErrors" class="my-5 rounded-sm bg-red-200 py-3 pr-3 pl-1">
+            <div class="flex items-center">
+              <ul class="ml-3 text-xs text-red-800">
+                <li>binary.state.exists: <span x-text="cache.forwarders_socks.binary.state.exists"></span></li>
+                <li>binary.state.chmod_x: <span x-text="cache.forwarders_socks.binary.state.chmod_x"></span></li>
+              </ul>
+              <div class="ml-auto pl-3">
+                <div class="-mx-1.5 -my-1.5">
+                  <button @click="showErrors=!showErrors" type="button" class="inline-flex bg-red-200 rounded-md p-1.5 text-red-500 hover:bg-red-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600">
+                    <span class="sr-only">Dismiss</span>
+                    <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </template>
 
-      <!-- main area -->
-
-      <div class="min-w-0">
-        <div :class="running() ? 'bg-green-500' : 'bg-gray-600'" class="flex items-center justify-between p-4" x-model="running">
-          <button class="text-white focus:outline-none rounded-full -m-2 p-1 hover:bg-white hover:bg-opacity-25 transition duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-          <span class="text-md text-white" x-text="waiting.length > 0 ? waiting.at(-1) : 'wireleap'"></span>
-          <button @click="refresh()" title="refresh" class="text-white focus:outline-none rounded-full -my-2 -mx-1 p-1 hover:bg-white hover:bg-opacity-25 transition duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" :class="[ waiting.length > 0 ? 'animate-spin' : '' ]" class="h-5 w-5" viewBox="0 0 1024 1024" fill="currentColor">
-              <path d="M909.1 209.3l-56.4 44.1C775.8 155.1 656.2 92 521.9 92 290 92 102.3 279.5 102 511.5 101.7 743.7 289.8 932 521.9 932c181.3 0 335.8-115 394.6-276.1 1.5-4.2-.7-8.9-4.9-10.3l-56.7-19.5a8 8 0 00-10.1 4.8c-1.8 5-3.8 10-5.9 14.9-17.3 41-42.1 77.8-73.7 109.4A344.77 344.77 0 01655.9 829c-42.3 17.9-87.4 27-133.8 27-46.5 0-91.5-9.1-133.8-27A341.5 341.5 0 01279 755.2a342.16 342.16 0 01-73.7-109.4c-17.9-42.4-27-87.4-27-133.9s9.1-91.5 27-133.9c17.3-41 42.1-77.8 73.7-109.4 31.6-31.6 68.4-56.4 109.3-73.8 42.3-17.9 87.4-27 133.8-27 46.5 0 91.5 9.1 133.8 27a341.5 341.5 0 01109.3 73.8c9.9 9.9 19.2 20.4 27.8 31.4l-60.2 47a8 8 0 003 14.1l175.6 43c5 1.2 9.9-2.6 9.9-7.7l.8-180.9c-.1-6.6-7.8-10.3-13-6.2z" />
-            </svg>
-          </button>
+      <!-- main:forwarders:tun -->
+      <template x-if="cache.forwarders_tun">
+        <div x-data="{showErrors: false}" class="py-2">
+          <template x-if="cache.forwarders_tun.binary.ok">
+            <div @click="cache.forwarders_tun.state == 'active' ? apiPostJson('/api/forwarders/tun/stop') : apiPostJson('/api/forwarders/tun/start')"
+                class="cursor-pointer flex justify-between items-center px-4 py-3 hover:bg-gray-600 hover:bg-opacity-75 transition duration-300 rounded">
+              <span class="flex-grow flex flex-col">
+                <span class="text-sm font-medium text-gray-300">TUN forwarder</span>
+                <span class="text-sm text-gray-50">Tunnel all traffic on the system</span>
+              </span>
+              <button type="button"
+                :class="cache.forwarders_socks.state == 'active' ? 'bg-green-500' : 'bg-gray-400'"
+                class="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" role="switch" aria-checked="false">
+                <span aria-hidden="true" :class="cache.forwarders_tun.state == 'active' ? 'translate-x-5' : 'translate-x-0'" class="pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"></span>
+              </button>
+            </div>
+          </template>
+          <template x-if="!cache.forwarders_tun.binary.ok">
+            <div @click="showErrors=!showErrors"
+                class="cursor-pointer flex justify-between items-center px-4 py-3 hover:bg-gray-600 hover:bg-opacity-75 transition duration-300 rounded">
+              <span class="flex-grow flex flex-col">
+                <span class="text-sm font-medium text-gray-300">TUN forwarder</span>
+                <span class="text-sm text-gray-50">Tunnel all traffic on the system</span>
+              </span>
+              <button type="button"
+                class="bg-gray-400 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" role="switch" aria-checked="false">
+                <span aria-hidden="true" class="translate-x-0 pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"></span>
+              </button>
+            </div>
+          </template>
+          <div x-cloak x-transition x-show="showErrors" class="my-5 rounded-sm bg-red-200 py-3 pr-3 pl-1">
+            <div class="flex items-center">
+              <ul class="ml-3 text-xs text-red-800">
+                <li>binary.state.exists: <span x-text="cache.forwarders_tun.binary.state.exists"></span></li>
+                <li>binary.state.chown_0: <span x-text="cache.forwarders_tun.binary.state.chown_0"></span></li>
+                <li>binary.state.chmod_x: <span x-text="cache.forwarders_tun.binary.state.chmod_x"></span></li>
+                <li>binary.state.chmod_us: <span x-text="cache.forwarders_tun.binary.state.chmod_us"></span></li>
+              </ul>
+              <div class="ml-auto pl-3">
+                <div class="-mx-1.5 -my-1.5">
+                  <button @click="showErrors=!showErrors" type="button" class="inline-flex bg-red-200 rounded-md p-1.5 text-red-500 hover:bg-red-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600">
+                    <span class="sr-only">Dismiss</span>
+                    <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </template>
 
-        <div class="h-full p-6">
-          <!-- Start main area-->
-          <div class="relative h-screen" style="min-height: 36rem">
+    </div>
 
+    <!-- main:circuit -->
+    <p class="text-gray-300 text-sm uppercase mt-12 mx-4">Circuit</p>
+    <div class="m-4 divide-y divide-gray-600">
+      <template x-if="cache.config">
+        <a href="#circuit" class="flex justify-between items-center px-4 py-3 hover:bg-gray-600 hover:bg-opacity-75 transition duration-300 rounded">
+          <div class="flex flex-col">
+            <span class="text-gray-300 text-sm">
+              <span x-text="cache.config.broker.circuit.hops"></span>
+              <span x-text="cache.config.broker.circuit.hops > 1 ? 'hops' : 'hop'"></span>,
+              <span x-text="cache.config.broker.circuit.whitelist.length > 0 ? 'selected' : 'any'"></span>
+              relays
+            </span>
+            <span class="text-sm text-gray-50">
+              <template x-if="cache.status.broker.active_circuit.length == 0">
+                <span>No active circuit</span>
+              </template>
+              <template x-if="cache.status.broker.active_circuit.length > 0">
+                <span>Exiting via
+                  <span class="border-b border-dotted border-gray-300" x-text="cache.status.broker.active_circuit.at(-1).split(':')[1].replace('//','')"></span>
+                </span>
+              </template>
+            </span>
+          </div>
+          <div class="h-4 w-4 text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </a>
+      </template>
+    </div>
 
-            <div x-cloak x-transition x-show="alertSuccess" class="mb-5 rounded-md bg-green-50 p-3">
-              <div class="flex items-center">
-                <div class="ml-3">
-                  <p class="text-xs text-green-800" x-text="alertSuccess"></p>
-                </div>
-                <div class="ml-auto pl-3">
-                  <div class="-mx-1.5 -my-1.5">
-                    <button @click="alertSuccess=''" type="button" class="inline-flex bg-green-50 rounded-md p-1.5 text-green-500 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-green-50 focus:ring-green-600">
-                      <span class="sr-only">Dismiss</span>
-                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <!-- main:accesskeys -->
+    <p class="text-gray-300 text-sm uppercase mt-12 mx-4">Access Keys</p>
+    <div class="m-4 divide-y divide-gray-600">
+      <template x-if="cache.accesskeys">
+        <a href="#accesskeys" class="flex justify-between items-center px-4 py-3 hover:bg-gray-600 hover:bg-opacity-75 transition duration-300 rounded">
+          <div class="flex flex-col">
+            <template x-if="cache.config">
+              <span class="text-gray-300 text-sm">Activate
+                <span x-show="cache.config.broker.accesskey.use_on_demand">on demand</span>
+                <span x-show="!cache.config.broker.accesskey.use_on_demand">manually</span>
+              </span>
+            </template>
+            <template x-for="accesskey in filterBy(cache.accesskeys, 'state', 'active')">
+              <span class="text-sm text-gray-50">Active key valid for the next
+                <span class="border-b border-dotted border-gray-300" x-text="expiresTimeLeft(accesskey.expiration)"></span>
+              </span>
+            </template>
+            <template x-if="filterBy(cache.accesskeys, 'state', 'active').length == 0">
+              <span class="text-sm text-gray-50">No access keys are active</span>
+            </template>
+          </div>
+          <div class="h-4 w-4 text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+        </a>
+      </template>
+    </div>
 
-            <div x-cloak x-transition x-show="alertError" class="mb-5 rounded-md bg-red-50 p-3">
-              <div class="flex items-center">
-                <div class="ml-3">
-                  <p class="text-xs text-red-800" x-text="alertError"></p>
-                </div>
-                <div class="ml-auto pl-3">
-                  <div class="-mx-1.5 -my-1.5">
-                    <button @click="alertError=''" type="button" class="inline-flex bg-red-50 rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600">
-                      <span class="sr-only">Dismiss</span>
-                      <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+  </main>
 
-            <div class="space-y-5">
+  <!-- tabs -->
+  <div class="flex-col w-full bg-gray-50 overflow-y-auto scroll-container border-l border-gray-200 px-5"
+       @hashchange.window="currentTab = location.hash.replace('#','')">
+    <div class="border-b border-gray-200">
+      <nav class="-mb-px flex space-x-8 -ml-8" aria-label="Tabs">
+        <template x-for="tab in ['accesskeys', 'circuit', 'logs', 'debug']">
+          <a :href="'#'+tab" x-text="tab" :class="currentTab == tab ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm capitalize"></a>
+        </template>
+      </nav>
+    </div>
 
-              <div class="border border-gray-200 rounded p-2">
-                <div class="flex items-center justify-between">
-                  <p class="text-xs text-gray-900 font-medium">SOCKS Forwarder</p>
-                  <template x-if="cache.forwarders_socks">
-                    <p class="text-xs" :class="cache.forwarders_socks.state == 'active' ? 'text-green-600' : 'text-gray-900'"  x-text="cache.forwarders_socks.state"></p>
-                  </template>
-                </div>
-                <template x-if="cache.forwarders_socks">
-                  <div class="py-4">
-                    <div x-show="cache.forwarders_socks.binary.ok">
-                      <button @click="apiPostJson('/api/forwarders/socks/start')" :disabled="cache.forwarders_socks.state == 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">start</button>
-                      <button @click="apiPostJson('/api/forwarders/socks/stop')" :disabled="cache.forwarders_socks.state != 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">stop</button>
-                    </div>
-                    <div x-show="!cache.forwarders_socks.binary.ok" class="bg-red-200 p-2 mt-5 rounded text-xs">
-                      <ul>
-                        <li>binary.state.exists: <span x-text="cache.forwarders_socks.binary.state.exists"></span></li>
-                        <li>binary.state.chmod_x: <span x-text="cache.forwarders_socks.binary.state.chmod_x"></span></li>
-                      </ul>
-                    </div>
-                  </div>
-                </template>
-              </div>
-
-              <div class="border border-gray-200 rounded p-2">
-                <div class="flex items-center justify-between">
-                  <p class="text-xs text-gray-900 font-medium">TUN Forwarder</p>
-                  <template x-if="cache.forwarders_tun">
-                    <p class="text-xs" :class="cache.forwarders_tun.state == 'active' ? 'text-green-600' : 'text-gray-900'"  x-text="cache.forwarders_tun.state"></p>
-                  </template>
-                </div>
-                <template x-if="cache.forwarders_tun">
-                  <div class="py-4">
-                    <div x-show="cache.forwarders_tun.binary.ok">
-                      <button @click="apiPostJson('/api/forwarders/tun/start')" :disabled="cache.forwarders_tun.state == 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">start</button>
-                      <button @click="apiPostJson('/api/forwarders/tun/stop')" :disabled="cache.forwarders_tun.state != 'active'" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">stop</button>
-                    </div>
-                    <div x-show="!cache.forwarders_tun.binary.ok" class="bg-red-200 p-2 mt-5 rounded text-xs">
-                      <ul>
-                        <li>binary.state.exists: <span x-text="cache.forwarders_tun.binary.state.exists"></span></li>
-                        <li>binary.state.chown_0: <span x-text="cache.forwarders_tun.binary.state.chown_0"></span></li>
-                        <li>binary.state.chmod_x: <span x-text="cache.forwarders_tun.binary.state.chmod_x"></span></li>
-                        <li>binary.state.chmod_us: <span x-text="cache.forwarders_tun.binary.state.chmod_us"></span></li>
-                      </ul>
-                    </div>
-                  </div>
-                </template>
-              </div>
-
-              <div class="border border-gray-200 rounded p-2">
-                <div class="flex items-center justify-between">
-                  <p class="text-xs text-gray-900 font-medium">Accesskeys</p>
-                </div>
-
-                <template x-if="cache.accesskeys">
-                  <ul role="list" class="mt-3 divide-y divide-gray-100">
-                    <template x-for="accesskey in filterBy(cache.accesskeys, 'state', 'active')">
-                      <li class="group flex items-center justify-between py-2">
-                        <div class="flex items-center space-x-3 text-xs">
-                          <span class="w-2.5 h-2.5 flex-shrink-0 bg-green-600 rounded-full" aria-hidden="true"></span>
-                          <div class="flex-1 items-center">
-                            <span class="font-medium text-xs leading-6 pl-1">active</span>
-                            <span class="font-normal text-gray-500">valid for the next</span>
-                            <span :title="expiresDate(accesskey.expiration)" class="text-gray-500 border-b border-dotted border-gray-700" x-text="expiresTimeLeft(accesskey.expiration)"></span>
-                          </div>
-                        </div>
-                        <span class="text-xs" x-text="timeLeft(accesskey.duration)"></span>
-                      </li>
-                    </template>
-                    <template x-for="accesskey in filterBy(cache.accesskeys, 'state', 'inactive')">
-                      <li class="group flex items-center justify-between py-2">
-                        <div class="flex items-center space-x-3 text-xs">
-                          <span class="w-2.5 h-2.5 flex-shrink-0 bg-yellow-600 rounded-full" aria-hidden="true"></span>
-                          <div class="flex-1 items-center">
-                            <span class="font-medium text-xs leading-6 pl-1">pending</span>
-                            <span class="font-normal text-gray-500">activate by</span>
-                            <span :title="expiresTimeLeft(accesskey.expiration)" class="text-gray-500 border-b border-dotted border-gray-700" x-text="expiresDate(accesskey.expiration)"></span>
-                          </div>
-                        </div>
-                        <span class="text-xs" x-text="timeLeft(accesskey.duration)"></span>
-                      </li>
-                    </template>
-                    <template x-for="accesskey in filterBy(cache.accesskeys, 'state', 'expired')">
-                      <li class="group flex items-center justify-between py-2">
-                        <div class="flex items-center space-x-3 text-xs">
-                          <span class="w-2.5 h-2.5 flex-shrink-0 bg-red-600 rounded-full" aria-hidden="true"></span>
-                          <div class="flex-1 items-center">
-                            <span class="font-medium text-xs leading-6 pl-1">expired</span>
-                            <span class="font-normal text-gray-500">activate by</span>
-                            <span :title="expiresTimeLeft(accesskey.expiration)" class="text-gray-500 border-b border-dotted border-gray-700" x-text="expiresDate(accesskey.expiration)"></span>
-                          </div>
-                        </div>
-                        <span class="text-xs" x-text="timeLeft(accesskey.duration)"></span>
-                      </li>
-                    </template>
-                  </ul>
-                </template>
-
-                <template x-if="cache.config">
-                  <div class="flex py-4 space-y-2 items-center justify-between">
-                    <form class="w-full flex items-center text-xs space-x-3">
-                      <input type="checkbox" id="use_on_demand" @change="apiPostJson('/api/config', {'broker': {'accesskey': {'use_on_demand': $event.target.checked}}})" :checked="cache.config.broker.accesskey.use_on_demand">
-                      <label for="use_on_demand">activate on demand (<span x-text="cache.config.broker.accesskey.use_on_demand"></span>)</label>
-                    </form>
-                    <!-- TODO: disabled - actually check if activation is needed and possible -->
-                    <button @click="apiPostJson('/api/accesskeys/activate')" :disabled="cache.config.broker.accesskey.use_on_demand" class="whitespace-nowrap disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">activate accesskey</button>
-                  </div>
-                </template>
-
-                <div class="my-2 w-full flex items-center text-xs space-x-2" x-data="{url: 'https://libre.wireleap.com/accesskeys'}">
-                  <input type="url" x-model="url" class="border border-gray-200 rounded-md p-1.5 focus:ring-indigo-500 focus:border-indigo-500 block w-full">
-                  <button @click="apiPostJson('/api/accesskeys/import', {'url': url})" :disabled="!url" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">import</button>
-                </div>
-
-              </div>
-
-              <div class="border border-gray-200 rounded p-2">
-                <div class="flex items-center justify-between">
-                  <p class="text-xs text-gray-900 font-medium">Circuit</p>
-                </div>
-
-                <template x-if="cache.status">
-                  <ul role="list" class="mt-3 divide-y divide-gray-100">
-                    <template x-if="cache.status.broker.active_circuit.length > 0">
-                      <button @click="apiPostJson('/api/reload')" class="whitespace-nowrap disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">blank out circuit</button>
-                    </template>
-                    <template x-if="cache.status.broker.active_circuit.length == 0">
-                      <li class="group flex items-center justify-between py-2">
-                        <div class="flex items-center space-x-3 text-xs">
-                          <span class="w-2.5 h-2.5 flex-shrink-0 bg-red-600 rounded-full" aria-hidden="true"></span>
-                          <div class="flex-1 items-center">
-                            <span class="font-medium text-xs leading-6 pl-1">inactive</span>
-                            <span class="font-normal text-gray-500">no relays</span>
-                          </div>
-                        </div>
-                      </li>
-                    </template>
-                    <template x-for="relay in cache.status.broker.active_circuit">
-                      <li class="group flex items-center justify-between py-2">
-                        <div class="flex items-center space-x-3 text-xs">
-                          <span class="w-2.5 h-2.5 flex-shrink-0 bg-green-600 rounded-full" aria-hidden="true"></span>
-                          <div class="flex-1 items-center">
-                            <span class="font-medium text-xs leading-6 pl-1">active</span>
-                            <span class="font-normal text-gray-500" x-text="relay"></span>
-                          </div>
-                        </div>
-                      </li>
-                    </template>
-                  </ul>
-                </template>
-
-                <template x-if="cache.config">
-                  <div class="text-xs flex items-center justify-between py-2">
-                    <p>hops: <span x-text="cache.config.broker.circuit.hops"></span></p>
-                    <div class="space-x-3">
-                      <template x-for="hops in [1, 2, 3]">
-                        <button @click="apiPostJson('/api/config', {'broker': {'circuit': {'hops': hops}}})" :class="cache.config.broker.circuit.hops == hops ? 'bg-blue-200' : ''" x-text="hops" class="w-14 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-blue-300"></button>
-                      </template>
-                    </div>
-                  </div>
-                </template>
-
-
-                <template x-if="cache.config">
-                  <template x-if="cache.relays">
-                    <div class="text-xs">
-                      <div x-data="{whitelist: cache.config.broker.circuit.whitelist, whitelist_enabled: cache.config.broker.circuit.whitelist.length > 0}">
-                        <ul role="list" class="mt-1 divide-y divide-gray-100 text-xs">
-                          <div class="flex py-2 space-y-2 items-center justify-between">
-                            <form class="w-full flex items-center text-xs space-x-3">
-                              <input type="checkbox" id="whitelist_enabled" @change="if ($event.target.checked) { whitelist=cache.config.broker.circuit.whitelist} else { whitelist=[] }" x-model="whitelist_enabled">
-                              <label for="whitelist_enabled">enable whitelist (<span x-text="whitelist_enabled"></span>)</label>
-                            </form>
-                            <button @click="apiPostJson('/api/config', {'broker': {'circuit': {'whitelist': whitelist}}}); whitelist_enabled = whitelist.length > 0" class="whitespace-nowrap disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">apply</button>
-                          </div>
-
-                          <template x-for="relay in filterBy(cache.relays, 'role', 'fronting')">
-                            <li class="group flex items-center justify-between py-2">
-                              <div class="flex-1 items-center">
-                                <input :disabled="!whitelist_enabled" type="checkbox" :value="relay.address" x-model="whitelist">
-                                <span class="font-medium text-xs leading-6 pl-1 pr-2" x-text="relay.role"></span>
-                                <span class="font-normal text-gray-500" x-text="relay.address"></span>
-                              </div>
-                              <span x-text="relay.versions.software"></span>
-                            </li>
-                          </template>
-
-                          <template x-for="relay in filterBy(cache.relays, 'role', 'entropic')">
-                            <li class="group flex items-center justify-between py-2">
-                              <div class="flex-1 items-center">
-                                <input :disabled="!whitelist_enabled" type="checkbox" :value="relay.address" x-model="whitelist">
-                                <span class="font-medium text-xs leading-6 pl-1 pr-2" x-text="relay.role"></span>
-                                <span class="font-normal text-gray-500" x-text="relay.address"></span>
-                              </div>
-                              <span x-text="relay.versions.software"></span>
-                            </li>
-                          </template>
-
-                          <template x-for="relay in filterBy(cache.relays, 'role', 'backing')">
-                            <li class="group flex items-center justify-between py-2">
-                              <div class="flex-1 items-center">
-                                <input :disabled="!whitelist_enabled" type="checkbox" :value="relay.address" x-model="whitelist">
-                                <span class="font-medium text-xs leading-6 pl-1 pr-2" x-text="relay.role"></span>
-                                <span class="font-normal text-gray-500" x-text="relay.address"></span>
-                              </div>
-                              <span x-text="relay.versions.software"></span>
-                            </li>
-                          </template>
-                        </ul>
-                        <p class="py-1">circuit.whitelist: <span x-text="cache.config.broker.circuit.whitelist"></span></p>
-                        <p class="py-1">whitelist: <span x-text="whitelist"></span></p>
-                      </div>
-                    </div>
-                  </template>
-                </template>
-
-              </div>
-
-            </div>
-
+    <div x-cloak x-transition x-show="alertError" class="my-5 rounded-md bg-red-50 p-3">
+      <div class="flex items-center">
+        <div class="ml-3">
+          <p class="text-xs text-red-800" x-text="alertError"></p>
+        </div>
+        <div class="ml-auto pl-3">
+          <div class="-mx-1.5 -my-1.5">
+            <button @click="alertError=''" type="button" class="inline-flex bg-red-50 rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600">
+              <span class="sr-only">Dismiss</span>
+              <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- right column -->
-    <div class="w-1/3 flex-shrink-0 border-l border-gray-200 bg-gray-50">
-      <div class="h-full p-6 lg:w-full">
-        <div class="relative space-y-5" style="min-height: 16rem">
-          <div>
-            <p class="text-sm font-bold py-2">Controller</p>
-            <template x-if="error.log">
-              <p class="p-1 bg-red-200 text-xs rounded" x-text="error.log">
-            </template>
-            <template x-if="cache.log">
-              <pre class="w-full max-h-52 overflow-y-auto text-xs scroll-container" x-text="cache.log" x-init="$watch('cache.log', value => $el.scrollTop = $el.scrollHeight)"></pre>
-            </template>
+    <!-- tab:accesskeys -->
+    <div x-cloak x-show="currentTab == 'accesskeys'">
+      <div class="space-y-3 mt-3 p-3 bg-white border border-gray-300 rounded-md">
+        <div class="my-2 w-full flex items-center text-xs space-x-2" x-data="{url: 'https://libre.wireleap.com/accesskeys'}">
+          <input type="url" x-model="url" class="border border-gray-200 rounded-md p-1.5 focus:ring-indigo-500 focus:border-indigo-500 block w-full">
+          <button @click="apiPostJson('/api/accesskeys/import', {'url': url})" :disabled="!url" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">import</button>
+        </div>
+        <template x-if="cache.config">
+          <div class="flex py-4 space-y-2 items-center justify-between">
+            <form class="w-full flex items-center text-xs space-x-3">
+              <input type="checkbox" id="use_on_demand" @change="apiPostJson('/api/config', {'broker': {'accesskey': {'use_on_demand': $event.target.checked}}})" :checked="cache.config.broker.accesskey.use_on_demand">
+              <label for="use_on_demand">activate on demand (<span x-text="cache.config.broker.accesskey.use_on_demand"></span>)</label>
+            </form>
+            <!-- TODO: disabled - actually check if activation is needed and possible -->
+            <button @click="apiPostJson('/api/accesskeys/activate')" :disabled="cache.config.broker.accesskey.use_on_demand" class="whitespace-nowrap disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">activate accesskey</button>
           </div>
+        </template>
+        <template x-if="cache.accesskeys">
+          <ul role="list" class="mt-3 divide-y divide-gray-100">
+            <template x-for="accesskey in filterBy(cache.accesskeys, 'state', 'active')">
+              <li class="group flex items-center justify-between py-2">
+                <div class="flex items-center space-x-3 text-xs">
+                  <span class="w-2.5 h-2.5 flex-shrink-0 bg-green-600 rounded-full" aria-hidden="true"></span>
+                  <div class="flex-1 items-center">
+                    <span class="font-medium text-xs leading-6 pl-1">active</span>
+                    <span class="font-normal text-gray-500">valid for the next</span>
+                    <span :title="expiresDate(accesskey.expiration)" class="text-gray-500 border-b border-dotted border-gray-700" x-text="expiresTimeLeft(accesskey.expiration)"></span>
+                  </div>
+                </div>
+                <span class="text-xs" x-text="timeLeft(accesskey.duration)"></span>
+              </li>
+            </template>
+            <template x-for="accesskey in filterBy(cache.accesskeys, 'state', 'inactive')">
+              <li class="group flex items-center justify-between py-2">
+                <div class="flex items-center space-x-3 text-xs">
+                  <span class="w-2.5 h-2.5 flex-shrink-0 bg-yellow-600 rounded-full" aria-hidden="true"></span>
+                  <div class="flex-1 items-center">
+                    <span class="font-medium text-xs leading-6 pl-1">pending</span>
+                    <span class="font-normal text-gray-500">activate by</span>
+                    <span :title="expiresTimeLeft(accesskey.expiration)" class="text-gray-500 border-b border-dotted border-gray-700" x-text="expiresDate(accesskey.expiration)"></span>
+                  </div>
+                </div>
+                <span class="text-xs" x-text="timeLeft(accesskey.duration)"></span>
+              </li>
+            </template>
+            <template x-for="accesskey in filterBy(cache.accesskeys, 'state', 'expired')">
+              <li class="group flex items-center justify-between py-2">
+                <div class="flex items-center space-x-3 text-xs">
+                  <span class="w-2.5 h-2.5 flex-shrink-0 bg-red-600 rounded-full" aria-hidden="true"></span>
+                  <div class="flex-1 items-center">
+                    <span class="font-medium text-xs leading-6 pl-1">expired</span>
+                    <span class="font-normal text-gray-500">at</span>
+                    <span class="text-gray-500 border-b border-dotted border-gray-700" x-text="expiresDate(accesskey.expiration)"></span>
+                  </div>
+                </div>
+                <span class="text-xs" x-text="timeLeft(accesskey.duration)"></span>
+              </li>
+            </template>
+          </ul>
+        </template>
+      </div>
+    </div>
 
-          <div>
-            <p class="text-sm font-bold py-2">SOCKS Forwarder</p>
-            <template x-if="error.forwarders_socks_log">
-              <p class="p-1 bg-red-200 text-xs rounded" x-text="error.forwarders_socks_log">
-            </template>
-            <template x-if="cache.forwarders_socks_log">
-              <pre class="w-full max-h-52 overflow-y-auto text-xs scroll-container" x-text="cache.forwarders_socks_log" x-init="$watch('cache.forwarders_socks_log', value => $el.scrollTop = $el.scrollHeight)"></pre>
-            </template>
+    <!-- tab:circuit -->
+    <div x-cloak x-show="currentTab == 'circuit'">
+      <div class="mt-3 p-3 bg-white border border-gray-300 rounded-md">
+        <!-- tab:circuit:hops -->
+        <template x-if="cache.config">
+          <div class="text-xs flex items-center justify-between py-2">
+            <p>hops: <span x-text="cache.config.broker.circuit.hops"></span></p>
+            <div class="space-x-3">
+              <template x-for="hops in [1, 2, 3]">
+                <button @click="apiPostJson('/api/config', {'broker': {'circuit': {'hops': hops}}})" :class="cache.config.broker.circuit.hops == hops ? 'bg-blue-200' : ''" x-text="hops" class="w-14 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-blue-300"></button>
+              </template>
+            </div>
           </div>
+        </template>
+        <!-- tab:circuit:active_circuit -->
+        <template x-if="cache.status">
+          <div class="flex items-center justify-between">
+            <ul role="list" class="w-full divide-y divide-gray-100">
+              <template x-if="cache.status.broker.active_circuit.length == 0">
+                <li class="group flex items-center justify-between py-2">
+                  <div class="flex items-center space-x-3 text-xs">
+                    <span class="w-2.5 h-2.5 flex-shrink-0 bg-red-600 rounded-full" aria-hidden="true"></span>
+                    <div class="flex-1 items-center">
+                      <span class="font-medium text-xs leading-6 pl-1">no active circuit</span>
+                    </div>
+                  </div>
+                </li>
+              </template>
+              <template x-for="relay in cache.status.broker.active_circuit">
+                <li class="group flex items-center justify-between py-2">
+                  <div class="flex items-center space-x-3 text-xs">
+                    <span class="w-2.5 h-2.5 flex-shrink-0 bg-green-600 rounded-full" aria-hidden="true"></span>
+                    <div class="flex-1 items-center">
+                      <span class="font-medium text-xs leading-6 pl-1">active</span>
+                      <span class="font-normal text-gray-500" x-text="relay"></span>
+                    </div>
+                  </div>
+                </li>
+              </template>
+            </ul>
+            <div class="flex">
+              <div class="flex-1">
+                <button @click="apiPostJson('/api/reload')" class="whitespace-nowrap disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">reset circuit</button>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
 
-          <div>
-            <p class="text-sm font-bold py-2">TUN Forwarder</p>
-            <template x-if="error.forwarders_tun_log">
-              <p class="p-1 bg-red-200 text-xs rounded" x-text="error.forwarders_tun_log">
-            </template>
-            <template x-if="cache.forwarders_tun_log">
-              <pre class="w-full max-h-52 overflow-y-auto text-xs scroll-container" x-text="cache.forwarders_tun_log" x-init="$watch('cache.forwarders_tun_log', value => $el.scrollTop = $el.scrollHeight)"></pre>
-            </template>
-          </div>
+      <!-- tab:circuit:whitelist -->
+      <div class="space-y-3 my-3 p-3 bg-white border border-gray-300 rounded-md">
+        <template x-if="cache.config">
+          <template x-if="cache.relays">
+            <div class="text-xs">
+              <div x-data="{whitelist: cache.config.broker.circuit.whitelist, whitelist_enabled: cache.config.broker.circuit.whitelist.length > 0}">
+                <div class="flex py-2 space-y-2 items-center justify-between">
+                  <form class="w-full flex items-center text-xs space-x-3">
+                    <input type="checkbox" id="whitelist_enabled" @change="if ($event.target.checked) { whitelist=cache.config.broker.circuit.whitelist} else { whitelist=[] }" x-model="whitelist_enabled">
+                    <label for="whitelist_enabled">enable whitelist (<span x-text="whitelist_enabled"></span>)</label>
+                  </form>
+                  <button @click="apiPostJson('/api/config', {'broker': {'circuit': {'whitelist': whitelist}}}); whitelist_enabled = whitelist.length > 0" class="whitespace-nowrap disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">apply</button>
+                </div>
+                <ul role="list" class="mt-1 divide-y divide-gray-100 text-xs">
+                  <template x-for="role in ['backing', 'entropic', 'fronting']">
+                    <template x-for="relay in filterBy(cache.relays, 'role', role)">
+                      <li class="group flex items-center justify-between py-2">
+                        <div class="flex items-center justify-between space-x-3">
+                          <input :disabled="!whitelist_enabled" type="checkbox" :value="relay.address" x-model="whitelist">
+                          <span class="font-medium text-xs leading-6" x-text="relay.role"></span>
+                          <span class="font-normal text-gray-500" x-text="relay.address"></span>
+                        </div>
+                        <span x-text="relay.versions.software"></span>
+                      </li>
+                    </template>
+                  </template>
+                </ul>
+                <!--
+                <p class="py-1">circuit.whitelist: <span x-text="cache.config.broker.circuit.whitelist"></span></p>
+                <p class="py-1">whitelist: <span x-text="whitelist"></span></p>
+                -->
+              </div>
+            </div>
+          </template>
+        </template>
+      </div>
+    </div>
+
+    <!-- tab:logs -->
+    <div x-cloak x-show="currentTab == 'logs'">
+      <div class="space-y-5 mt-3">
+        <div>
+          <p class="text-xs text-gray-900 font-medium uppercase pb-2 pt-4">Controller</p>
+          <template x-if="error.log">
+            <pre class="w-full h-44 p-1 overflow-y-auto text-xs scroll-container border border-gray-300 rounded-md bg-white" x-text="error.log"></pre>
+          </template>
+          <template x-if="cache.log">
+            <pre class="w-full h-44 p-1 overflow-y-auto text-xs scroll-container border border-gray-300 rounded-md bg-white"
+                  x-text="cache.log"
+                  x-init="$nextTick(() => $el.scrollTop = $el.scrollHeight); $watch('cache.log', value => $el.scrollTop = $el.scrollHeight)"></pre>
+          </template>
+        </div>
+        <div>
+          <p class="text-xs text-gray-900 font-medium uppercase pb-2 pt-4">SOCKS Forwarder</p>
+          <template x-if="error.forwarders_socks_log">
+            <pre class="w-full h-44 p-1 overflow-y-auto text-xs scroll-container border border-gray-300 rounded-md bg-white" x-text="error.forwarders_socks_log"></pre>
+          </template>
+          <template x-if="cache.forwarders_socks_log">
+            <pre class="w-full h-44 p-1 overflow-y-auto text-xs scroll-container border border-gray-300 rounded-md bg-white"
+                  x-text="cache.forwarders_socks_log"
+                  x-init="$nextTick(() => $el.scrollTop = $el.scrollHeight); $watch('cache.forwarders_socks_log', value => $el.scrollTop = $el.scrollHeight)"></pre>
+          </template>
+        </div>
+        <div>
+          <p class="text-xs text-gray-900 font-medium uppercase pb-2 pt-4">TUN Forwarder</p>
+          <template x-if="error.forwarders_tun_log">
+            <pre class="w-full h-44 p-1 overflow-y-auto text-xs scroll-container border border-gray-300 rounded-md bg-white" x-text="error.forwarders_tun_log"></pre>
+          </template>
+          <template x-if="cache.forwarders_tun_log">
+            <pre class="w-full h-44 p-1 overflow-y-auto text-xs scroll-container border border-gray-300 rounded-md bg-white"
+                  x-text="cache.forwarders_tun_log"
+                  x-init="$nextTick(() => $el.scrollTop = $el.scrollHeight); $watch('cache.forwarders_tun_log', value => $el.scrollTop = $el.scrollHeight)"></pre>
+          </template>
         </div>
       </div>
     </div>
-  </div>
 
+    <!-- tab:debug -->
+    <div x-cloak x-show="currentTab == 'debug'">
+      <div class="h-full relative space-y-3 scroll-container overflow-y-auto overflow-hidden mt-3 pb-10">
+        <!-- tab:debug:core -->
+        <p class="text-xs text-gray-900 font-medium uppercase pt-4">Core</p>
+        <div class="space-y-3 mt-3 p-3 bg-white border border-gray-300 rounded-md">
+          <details class="text-xs whitespace-nowrap cursor-pointer">
+            <summary class="text-gray-600 font-light">version</summary>
+            <template x-if="error.version"><p class="p-1 bg-red-200" x-text="error.version"></template>
+            <template x-if="cache.version">
+              <ul class="ml-1 p-2 border-l-2 border-blue-200">
+                <li>version: <span x-text="cache.version.version"></span></li>
+              </ul>
+            </template>
+          </details>
+          <details class="text-xs whitespace-nowrap cursor-pointer">
+            <summary class="text-gray-600 font-light">status</summary>
+            <template x-if="error.status"><p class="p-1 bg-red-200" x-text="error.status"></template>
+            <template x-if="cache.status">
+              <ul class="ml-1 p-2 border-l-2 border-blue-200">
+                <li>home: <span x-text="cache.status.home"></span></li>
+                <li>pid: <span x-text="cache.status.pid"></span></li>
+                <li>state: <span x-text="cache.status.state"></span></li>
+                <li>broker.active_circuit: <span x-text="cache.status.broker.active_circuit"></span></li>
+                <li>upgrade.required: <span x-text="cache.status.upgrade.required"></span></li>
+              </ul>
+            </template>
+          </details>
+          <details class="text-xs whitespace-nowrap cursor-pointer">
+            <summary class="text-gray-600 font-light">config</summary>
+            <template x-if="error.config"><p class="p-1 bg-red-200" x-text="error.config"></template>
+            <template x-if="cache.config">
+              <ul class="ml-1 p-2 border-l-2 border-blue-200">
+                <li>address: <span x-text="cache.config.address"></span></li>
+                <li>broker.address: <span x-text="cache.config.broker.address"></span></li>
+                <li>broker.accesskey.use_on_demand: <span x-text="cache.config.broker.accesskey.use_on_demand"></span></li>
+                <li>broker.circuit.timeout: <span x-text="cache.config.broker.circuit.timeout"></span></li>
+                <li>broker.circuit.hops: <span x-text="cache.config.broker.circuit.hops"></span></li>
+                <li>broker.circuit.whitelist: <span x-text="cache.config.broker.circuit.whitelist"></span></li>
+                <li>forwarders.socks.address: <span x-text="cache.config.forwarders.socks.address"></span></li>
+                <li>forwarders.tun.address: <span x-text="cache.config.forwarders.tun.address"></span></li>
+              </ul>
+            </template>
+          </details>
+          <details class="text-xs whitespace-nowrap cursor-pointer">
+            <summary class="text-gray-600 font-light">runtime</summary>
+            <template x-if="error.runtime"><p class="p-1 bg-red-200" x-text="error.runtime"></template>
+            <template x-if="cache.runtime">
+              <ul class="ml-1 p-2 border-l-2 border-blue-200">
+                <li>versions.software: <span x-text="cache.runtime.versions.software"></span></li>
+                <li>versions.api: <span x-text="cache.runtime.versions.api"></span></li>
+                <li>versions.client-contract: <span x-text="cache.runtime.versions['client-contract']"></span></li>
+                <li>versions.client-dir: <span x-text="cache.runtime.versions['client-dir']"></span></li>
+                <li>versions.client-relay: <span x-text="cache.runtime.versions['client-relay']"></span></li>
+                <li>upgrade.supported: <span x-text="cache.runtime.upgrade.supported"></span></li>
+                <li>build.gitcommit: <span x-text="cache.runtime.build.gitcommit"></span></li>
+                <li>build.goversion: <span x-text="cache.runtime.build.goversion"></span></li>
+                <li>build.time: <span x-text="cache.runtime.build.time"></span></li>
+                <li>build.flags: <span x-text="cache.runtime.build.flags"></span></li>
+                <li>platform.os: <span x-text="cache.runtime.platform.os"></span></li>
+                <li>platform.arch: <span x-text="cache.runtime.platform.arch"></span></li>
+              </ul>
+            </template>
+          </details>
+        </div>
+        <!-- tab:debug:resources -->
+        <p class="text-xs text-gray-900 font-medium uppercase pt-4">Resources</p>
+        <div class="space-y-3 mt-3 p-3 bg-white border border-gray-300 rounded-md">
+          <details class="text-xs whitespace-nowrap cursor-pointer">
+            <summary class="text-gray-600 font-light">accesskeys</summary>
+            <template x-if="error.accesskeys"><p class="p-1 bg-red-200" x-text="error.accesskeys"></template>
+            <template x-if="cache.accesskeys">
+              <template x-for="accesskey in cache.accesskeys">
+                <ul class="ml-1 p-2 border-l-2 border-blue-200">
+                  <li>contract: <span x-text="accesskey.contract"></span></li>
+                  <li>duration: <span x-text="accesskey.duration"></span></li>
+                  <li>expiration: <span x-text="accesskey.expiration"></span></li>
+                  <li>state: <span x-text="accesskey.state"></span></li>
+                </ul>
+              </template>
+            </template>
+          </details>
+          <details class="text-xs whitespace-nowrap cursor-pointer">
+            <summary class="text-gray-600 font-light">relays</summary>
+            <template x-if="error.relays"><p class="p-1 bg-red-200" x-text="error.relays"></template>
+            <template x-if="cache.relays">
+              <template x-for="relay in cache.relays">
+                <ul class="ml-1 p-2 border-l-2 border-blue-200">
+                  <li>role: <span x-text="relay.role"></span></li>
+                  <li>address: <span x-text="relay.address"></span></li>
+                  <li>pubkey: <span x-text="relay.pubkey"></span></li>
+                  <li>selectable: <span x-text="relay.selectable"></span></li>
+                  <li>versions.software: <span x-text="relay.versions.software"></span></li>
+                  <li>versions.client-relay: <span x-text="relay.versions['client-relay']"></span></li>
+                </ul>
+              </template>
+            </template>
+          </details>
+          <details class="text-xs whitespace-nowrap cursor-pointer">
+            <summary class="text-gray-600 font-light">contract</summary>
+            <template x-if="error.contract"><p class="p-1 bg-red-200" x-text="error.contract"></template>
+            <template x-if="cache.contract">
+              <ul class="ml-1 p-2 border-l-2 border-blue-200">
+                <li>pubkey: <span x-text="cache.contract.pubkey"></span></li>
+                <li>version: <span x-text="cache.contract.version"></span></li>
+                <li>endpoint: <span x-text="cache.contract.endpoint"></span></li>
+                <template x-for="proof_of_funding in cache.contract.proof_of_funding">
+                  <ul class="py-2">
+                    <li>proof_of_funding.type: <span x-text="proof_of_funding.type"></span></li>
+                    <li>proof_of_funding.endpoint: <span x-text="proof_of_funding.endpoint"></span></li>
+                    <li>proof_of_funding.pubkey: <span x-text="proof_of_funding.pubkey"></span></li>
+                  </ul>
+                </template>
+                <li>servicekey.duration: <span x-text="cache.contract.servicekey.duration"></span></li>
+                <li>servicekey.currency: <span x-text="cache.contract.servicekey.currency"></span></li>
+                <li>servicekey.value: <span x-text="cache.contract.servicekey.value"></span></li>
+                <li>directory.endpoint: <span x-text="cache.contract.directory.endpoint"></span></li>
+                <li>directory.public_key: <span x-text="cache.contract.directory.public_key"></span></li>
+                <li>metadata.operator: <span x-text="cache.contract.metadata.operator"></span></li>
+                <li>metadata.operator_url: <span x-text="cache.contract.metadata.operator_url"></span></li>
+                <li>metadata.name: <span x-text="cache.contract.metadata.name"></span></li>
+                <li>metadata.terms_of_service: <span x-text="cache.contract.metadata.terms_of_service"></span></li>
+                <li>metadata.privacy_policy: <span x-text="cache.contract.metadata.privacy_policy"></span></li>
+              </ul>
+            </template>
+          </details>
+        </div>
+        <!-- tab:debug:forwarders -->
+        <p class="text-xs text-gray-900 font-medium uppercase pt-4">Forwarders</p>
+        <div class="space-y-3 mt-3 p-3 bg-white border border-gray-300 rounded-md">
+          <details class="text-xs whitespace-nowrap cursor-pointer">
+            <summary class="text-gray-600 font-light">socks</summary>
+            <template x-if="error.forwarders_socks"><p class="p-1 bg-red-200" x-text="error.forwarders_socks"></template>
+            <template x-if="cache.forwarders_socks">
+              <ul class="ml-1 p-2 border-l-2 border-blue-200">
+                <li>pid: <span x-text="cache.forwarders_socks.pid"></span></li>
+                <li>state: <span x-text="cache.forwarders_socks.state"></span></li>
+                <li>address: <span x-text="cache.forwarders_socks.address"></span></li>
+                <li>binary.ok: <span x-text="cache.forwarders_socks.binary.ok"></span></li>
+                <li>binary.state.exists: <span x-text="cache.forwarders_socks.binary.state.exists"></span></li>
+                <li>binary.state.chmod_x: <span x-text="cache.forwarders_socks.binary.state.chmod_x"></span></li>
+              </ul>
+            </template>
+          </details>
+          <details class="text-xs whitespace-nowrap cursor-pointer">
+            <summary class="text-gray-600 font-light">tun</summary>
+            <template x-if="error.forwarders_tun"><p class="p-1 bg-red-200" x-text="error.forwarders_tun"></template>
+            <template x-if="cache.forwarders_tun">
+              <ul class="ml-1 p-2 border-l-2 border-blue-200">
+                <li>pid: <span x-text="cache.forwarders_tun.pid"></span></li>
+                <li>state: <span x-text="cache.forwarders_tun.state"></span></li>
+                <li>address: <span x-text="cache.forwarders_tun.address"></span></li>
+                <li>binary.ok: <span x-text="cache.forwarders_tun.binary.ok"></span></li>
+                <li>binary.state.exists: <span x-text="cache.forwarders_tun.binary.state.exists"></span></li>
+                <li>binary.state.chown_0: <span x-text="cache.forwarders_tun.binary.state.chown_0"></span></li>
+                <li>binary.state.chmod_x: <span x-text="cache.forwarders_tun.binary.state.chmod_x"></span></li>
+                <li>binary.state.chmod_us: <span x-text="cache.forwarders_tun.binary.state.chmod_us"></span></li>
+              </ul>
+            </template>
+          </details>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 </div>
@@ -546,12 +611,11 @@
 <script type="text/javascript">
 function alpineInstance() {
   return {
+    currentTab: location.hash.replace('#','') || 'logs',
+    alertError: '',
     waiting: [],
-    breakpoints: false,
     cache: {},
     error: {},
-    alertSuccess: '',
-    alertError: '',
     initialize() {
       this.refresh();
     },
@@ -587,43 +651,24 @@ function alpineInstance() {
           throw response;
         })
         .then(data => {
-          console.log(uri);
-          console.log(data);
-
+          this.apiGetText("/api/log");
           if (uri.startsWith("/api/forwarders/socks")) {
             this.cache.forwarders_socks = data;
             this.apiGetText("/api/forwarders/socks/log");
           }
-
           if (uri.startsWith("/api/forwarders/tun")) {
             this.cache.forwarders_tun = data;
             this.apiGetText("/api/forwarders/tun/log");
           }
-
           if (uri.startsWith("/api/config")) {
             this.cache.config = data;
-            this.apiGetText("/api/log");
           }
-
           if (uri.startsWith("/api/reload")) {
-            this.cache.status = data;
-            this.apiGetText("/api/log");
+            //TODO: this.cache.status = data;
+            this.apiGetJson("/api/status");
           }
-
-          if (uri.startsWith("/api/accesskeys/import")) {
-            //TODO: returns raw json file contents, not list of accesskey objects
-            //this.cache.accesskeys = data; // append to existing
-            console.log('accesskeys/import');
-            console.log(data);
-            this.alertSuccess = "successfully imported accesskeys";
+          if (uri.startsWith("/api/accesskeys")) {
             this.apiGetJson("/api/accesskeys");
-            this.apiGetText("/api/log");
-          }
-
-          if (uri.startsWith("/api/accesskeys/activate")) {
-            this.alertSuccess = "successfully activated accesskey";
-            this.apiGetJson("/api/accesskeys");
-            this.apiGetText("/api/log");
           }
         })
         .catch(error => {
@@ -632,7 +677,6 @@ function alpineInstance() {
         })
         .finally(() => {
           this.waiting.pop(uri);
-          //console.log('finally');
         });
 
     },
@@ -647,7 +691,6 @@ function alpineInstance() {
         .then(data => {
           this.cache[cacheKey] = data;
           this.error[cacheKey] = null;
-          //console.log(data);
         })
         .catch(error => {
           this.cache[cacheKey] = null;
@@ -655,7 +698,6 @@ function alpineInstance() {
         })
         .finally(() => {
           this.waiting.pop(uri);
-          //console.log('finally');
         });
     },
     apiGetText(uri) {
@@ -676,22 +718,13 @@ function alpineInstance() {
         })
         .finally(() => {
           this.waiting.pop(uri);
-          //console.log('finally');
         });
     },
-
     filterBy(collection, key, value) {
       return collection.filter(
         entry => entry[key] == value
       );
     },
-
-    //filterByIncludes(collection, key, value) {
-    //  return collection.filter(
-    //    entry => entry[key].toLowerCase().includes(value.toLowerCase())
-    //  );
-    //},
-
     timeLeft(seconds) {
       if (seconds < 1) return "0 seconds";
       var d = Math.floor(seconds / (3600*24));
