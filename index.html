@@ -161,31 +161,33 @@
     <p class="text-gray-300 text-sm uppercase mt-12 mx-4">Circuit</p>
     <div class="m-4 divide-y divide-gray-600">
       <template x-if="cache.config">
-        <a href="#circuit" class="flex justify-between items-center px-4 py-3 hover:bg-gray-600 hover:bg-opacity-75 transition duration-300 rounded">
-          <div class="flex flex-col">
-            <span class="text-gray-300 text-sm">
-              <span x-text="cache.config.broker.circuit.hops"></span>
-              <span x-text="cache.config.broker.circuit.hops > 1 ? 'hops' : 'hop'"></span>,
-              <span x-text="cache.config.broker.circuit.whitelist.length > 0 ? 'selected' : 'any'"></span>
-              relays
-            </span>
-            <span class="text-sm text-gray-50">
-              <template x-if="cache.status.broker.active_circuit.length == 0">
-                <span>No active circuit</span>
-              </template>
-              <template x-if="cache.status.broker.active_circuit.length > 0">
-                <span>Exiting via
-                  <span class="border-b border-dotted border-gray-300" x-text="cache.status.broker.active_circuit.at(-1).split(':')[1].replace('//','')"></span>
-                </span>
-              </template>
-            </span>
-          </div>
-          <div class="h-4 w-4 text-gray-300">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-        </a>
+        <div class="py-2">
+          <a href="#circuit" class="flex justify-between items-center px-4 py-3 hover:bg-gray-600 hover:bg-opacity-75 transition duration-300 rounded">
+            <div class="flex flex-col">
+              <span class="text-gray-300 text-sm">
+                <span x-text="cache.config.broker.circuit.hops"></span>
+                <span x-text="cache.config.broker.circuit.hops > 1 ? 'hops' : 'hop'"></span>,
+                <span x-text="cache.config.broker.circuit.whitelist.length > 0 ? 'selected' : 'any'"></span>
+                relays
+              </span>
+              <span class="text-sm text-gray-50">
+                <template x-if="cache.status.broker.active_circuit.length == 0">
+                  <span>No active circuit</span>
+                </template>
+                <template x-if="cache.status.broker.active_circuit.length > 0">
+                  <span>Exiting via
+                    <span class="border-b border-dotted border-gray-300" x-text="cache.status.broker.active_circuit.at(-1).split(':')[1].replace('//','')"></span>
+                  </span>
+                </template>
+              </span>
+            </div>
+            <div class="h-4 w-4 text-gray-300">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </a>
+        </div>
       </template>
     </div>
 
@@ -193,34 +195,36 @@
     <p class="text-gray-300 text-sm uppercase mt-12 mx-4">Access Keys</p>
     <div class="m-4 divide-y divide-gray-600">
       <template x-if="cache.config">
-        <a href="#accesskeys" class="flex justify-between items-center px-4 py-3 hover:bg-gray-600 hover:bg-opacity-75 transition duration-300 rounded">
-          <div class="flex flex-col">
-            <span class="text-gray-300 text-sm">Activate
-              <span x-show="cache.config.broker.accesskey.use_on_demand">on demand</span>
-              <span x-show="!cache.config.broker.accesskey.use_on_demand">manually</span>
-            </span>
-            <template x-if="cache.accesskeys">
-              <template x-for="accesskey in filterBy(cache.accesskeys, 'state', 'active')">
-                <span class="text-sm text-gray-50">Active key valid for the next
-                  <span class="border-b border-dotted border-gray-300" x-text="expiresTimeLeft(accesskey.expiration)"></span>
-                </span>
+        <div class="py-2">
+          <a href="#accesskeys" class="flex justify-between items-center px-4 py-3 hover:bg-gray-600 hover:bg-opacity-75 transition duration-300 rounded">
+            <div class="flex flex-col">
+              <span class="text-gray-300 text-sm">Activate
+                <span x-show="cache.config.broker.accesskey.use_on_demand">on demand</span>
+                <span x-show="!cache.config.broker.accesskey.use_on_demand">manually</span>
+              </span>
+              <template x-if="cache.accesskeys">
+                <template x-for="accesskey in filterBy(cache.accesskeys, 'state', 'active')">
+                  <span class="text-sm text-gray-50">Active key valid for the next
+                    <span class="border-b border-dotted border-gray-300" x-text="expiresTimeLeft(accesskey.expiration)"></span>
+                  </span>
+                </template>
               </template>
-            </template>
-            <template x-if="cache.accesskeys">
-              <template x-if="filterBy(cache.accesskeys, 'state', 'active').length == 0">
+              <template x-if="cache.accesskeys">
+                <template x-if="filterBy(cache.accesskeys, 'state', 'active').length == 0">
+                  <span class="text-sm text-gray-50">No access keys are active</span>
+                </template>
+              </template>
+              <template x-if="!cache.accesskeys">
                 <span class="text-sm text-gray-50">No access keys are active</span>
               </template>
-            </template>
-            <template x-if="!cache.accesskeys">
-              <span class="text-sm text-gray-50">No access keys are active</span>
-            </template>
-          </div>
-          <div class="h-4 w-4 text-gray-300">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-        </a>
+            </div>
+            <div class="h-4 w-4 text-gray-300">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </a>
+        </div>
       </template>
     </div>
 
