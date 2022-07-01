@@ -31,10 +31,107 @@
 <div x-data="alpineInstance()" x-init="initialize()">
 
 <div class="flex h-screen">
+
+  <!-- panel:info -->
+  <div x-cloak class="relative z-10" role="dialog" aria-modal="true">
+    <div class="fixed inset-y-0 left-0 flex border-r border-gray-400"
+          x-show="currentPanel=='info'"
+          x-transition:enter="transform transition ease-in-out duration-500"
+          x-transition:enter-start="-translate-x-full"
+          x-transition:enter-end="translate-x-0"
+          x-transition:leave="transform transition ease-in-out duration-500"
+          x-transition:leave-start="translate-x-0"
+          x-transition:leave-end="-translate-x-full">
+      <div class="flex-col min-w-[500px] bg-gray-700 overflow-y-auto scroll-container">
+        <div class="flex items-center justify-between p-4 bg-gray-600">
+          <button @click="currentPanel=''" class="text-white focus:outline-none rounded-full -m-2 p-1 hover:bg-white hover:bg-opacity-25 transition duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <span class="text-md text-white">Info</span>
+          <div></div>
+        </div>
+        <p class="text-gray-300 text-sm uppercase mt-12 mx-4">Network</p>
+        <div class="m-4 divide-y divide-gray-600">
+          <template x-if="cache.contract">
+            <div class="space-y-3 pt-5 w-full text-sm">
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-gray-300">Operator</span>
+                <span class="text-gray-50" x-text="cache.contract.metadata.operator || 'Not specified'"></span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-gray-300">Name</span>
+                <span class="text-gray-50" x-text="cache.contract.metadata.name || 'Not specified'"></span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-gray-300">Website</span>
+                <a class="text-gray-50 border-b border-dotted border-gray-500 hover:border-gray-300"  :href="cache.contract.metadata.operator_url">Link</a>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-gray-300">Privacy policy</span>
+                <a class="text-gray-50 border-b border-dotted border-gray-500 hover:border-gray-300"  :href="cache.contract.metadata.privacy_policy">Link</a>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-gray-300">Terms of service</span>
+                <a class="text-gray-50 border-b border-dotted border-gray-500 hover:border-gray-300"  :href="cache.contract.metadata.terms_of_service">Link</a>
+              </div>
+            </div>
+          </template>
+          <template x-if="!cache.contract">
+            <div class="space-y-3 pt-5 w-full text-sm">
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-gray-300">Not configured</span>
+              </div>
+            </div>
+          </template>
+        </div>
+        <p class="text-gray-300 text-sm uppercase mt-12 mx-4">Client runtime</p>
+        <div class="m-4 divide-y divide-gray-600">
+          <template x-if="cache.runtime">
+            <div class="space-y-3 pt-5 w-full text-sm">
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-gray-300">API</span>
+                <span class="text-gray-50" x-text="cache.runtime.versions.api"></span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-gray-300">Software</span>
+                <span class="text-gray-50" x-text="cache.runtime.versions.software"></span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-gray-300">Relay protocol</span>
+                <span class="text-gray-50" x-text="cache.runtime.versions['client-relay']"></span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-gray-300">Contract protocol</span>
+                <span class="text-gray-50" x-text="cache.runtime.versions['client-contract']"></span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-gray-300">Directory protocol</span>
+                <span class="text-gray-50" x-text="cache.runtime.versions['client-dir']"></span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-gray-300">Platform</span>
+                <span class="text-gray-50" x-text="cache.runtime.platform.os + '/' + cache.runtime.platform.arch"></span>
+              </div>
+            </div>
+          </template>
+          <template x-if="!cache.runtime">
+            <div class="space-y-3 pt-5 w-full text-sm">
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-gray-300">Unknown</span>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <main class="flex-col min-w-[500px] bg-gray-700 overflow-y-auto scroll-container">
     <!-- navbar -->
     <div :class="running() ? 'bg-green-500' : 'bg-gray-600'" class="flex items-center justify-between p-4" x-model="running">
-      <button class="text-white focus:outline-none rounded-full -m-2 p-1 hover:bg-white hover:bg-opacity-25 transition duration-300">
+      <button @click="currentPanel='info'" class="text-white focus:outline-none rounded-full -m-2 p-1 hover:bg-white hover:bg-opacity-25 transition duration-300">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
@@ -333,7 +430,7 @@
                   <span class="w-2.5 h-2.5 flex-shrink-0 bg-red-600 rounded-full" aria-hidden="true"></span>
                   <div class="flex-1 items-center">
                     <span class="font-medium text-xs leading-6 pl-1">expired</span>
-                    <span class="font-normal text-gray-500">at</span>
+                    <span class="font-normal text-gray-500">on</span>
                     <span class="text-gray-500 border-b border-dotted border-gray-700" x-text="expiresDate(accesskey.expiration)"></span>
                   </div>
                 </div>
@@ -656,6 +753,7 @@
 function alpineInstance() {
   return {
     currentTab: location.hash.replace('#','') || 'accesskeys',
+    currentPanel: '',
     alertError: '',
     waiting: [],
     filter: '',
