@@ -419,7 +419,7 @@
     <div class="m-4 divide-y divide-gray-600">
       <template x-if="cache.config">
         <div class="py-2">
-          <a @click="currentPanel='accesskeys'" href="#accesskeys" class="flex justify-between items-center px-4 py-3 hover:bg-gray-600 hover:bg-opacity-75 transition duration-300 rounded">
+          <a @click="currentPanel='accesskeys'" href="#usage" class="flex justify-between items-center px-4 py-3 hover:bg-gray-600 hover:bg-opacity-75 transition duration-300 rounded">
             <div class="flex flex-col">
               <span class="text-gray-300 text-sm">Activate
                 <span x-show="cache.config.broker.accesskey.use_on_demand">on demand</span>
@@ -458,7 +458,7 @@
        @hashchange.window="currentTab = location.hash.replace('#','')">
     <div class="border-b border-gray-200">
       <nav class="-mb-px flex space-x-8 -ml-8" aria-label="Tabs">
-        <template x-for="tab in ['accesskeys', 'circuit', 'logs', 'debug']">
+        <template x-for="tab in ['usage', 'circuit', 'logs', 'debug']">
           <a :href="'#'+tab" x-text="tab" :class="currentTab == tab ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm capitalize"></a>
         </template>
       </nav>
@@ -482,66 +482,38 @@
       </div>
     </div>
 
-    <!-- tab:accesskeys -->
-    <div x-cloak x-show="currentTab == 'accesskeys'">
-      <div class="space-y-3 mt-3 p-3 bg-white border border-gray-300 rounded-md">
-        <div class="my-2 w-full flex items-center text-xs space-x-2" x-data="{url: 'https://libre.wireleap.com/accesskeys'}">
-          <input type="url" x-model="url" class="border border-gray-200 rounded-md p-1.5 focus:ring-indigo-500 focus:border-indigo-500 block w-full">
-          <button @click="apiPostJson('/api/accesskeys/import', {'url': url})" :disabled="!url" class="disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">import</button>
-        </div>
-        <template x-if="cache.config">
-          <div class="flex py-4 space-y-2 items-center justify-between">
-            <form class="w-full flex items-center text-xs space-x-3">
-              <input type="checkbox" id="use_on_demand" @change="apiPostJson('/api/config', {'broker': {'accesskey': {'use_on_demand': $event.target.checked}}})" :checked="cache.config.broker.accesskey.use_on_demand">
-              <label for="use_on_demand">activate on demand (<span x-text="cache.config.broker.accesskey.use_on_demand"></span>)</label>
-            </form>
-            <!-- TODO: disabled - actually check if activation is needed and possible -->
-            <button @click="apiPostJson('/api/accesskeys/activate')" :disabled="cache.config.broker.accesskey.use_on_demand" class="whitespace-nowrap disabled:text-gray-200 border border-gray-300 rounded shadow-sm text-xs px-2 pt-1.5 pb-1 items-center justify-center hover:bg-gray-50">activate accesskey</button>
+    <!-- tab:usage -->
+    <div x-cloak x-show="currentTab == 'usage'">
+      <div class="space-y-5 mt-3">
+        <div>
+          <p class="text-xs text-gray-900 font-medium uppercase pt-4">Getting started</p>
+          <div class="space-y-3 mt-3 p-3 bg-white border border-gray-300 rounded-md">
+            <nav class="" aria-label="Progress">
+              <ol role="list" class="space-y-4 lg:flex lg:space-y-0 lg:space-x-8">
+                <li @click="currentPanel='accesskeys'" class="lg:flex-1 cursor-pointer">
+                  <div :class="cache.contract ? 'border-indigo-600 hover:border-indigo-800' : 'border-gray-200 hover:border-gray-300'" class="group pl-4 py-2 flex flex-col border-l-4 lg:pl-0 lg:pt-4 lg:pb-0 lg:border-l-0 lg:border-t-4">
+                    <span :class="cache.contract ? 'text-indigo-600 group-hover:text-indigo-800' : 'text-gray-500 group-hover:text-gray-700'" class="text-xs font-semibold tracking-wide uppercase">Step 1</span>
+                    <span class="text-sm font-medium">Import an access key</span>
+                  </div>
+                </li>
+                <li @click="currentPanel=''" class="lg:flex-1 cursor-pointer">
+                  <div :class="running() ? 'border-indigo-600 hover:border-indigo-800' : 'border-gray-200 hover:border-gray-300'" class="group pl-4 py-2 flex flex-col border-l-4 lg:pl-0 lg:pt-4 lg:pb-0 lg:border-l-0 lg:border-t-4">
+                    <span :class="running() ? 'text-indigo-600 group-hover:text-indigo-800' : 'text-gray-500 group-hover:text-gray-700'" class="text-xs font-semibold tracking-wide uppercase">Step 2</span>
+                    <span class="text-sm font-medium">Enable a traffic forwarder</span>
+                  </div>
+                </li>
+                <li class="lg:flex-1">
+                  <template x-if="cache.status">
+                    <div :class="cache.status.broker.active_circuit.length > 0 ? 'border-indigo-600 hover:border-indigo-800' : 'border-gray-200 hover:border-gray-300'" class="group pl-4 py-2 flex flex-col border-l-4 lg:pl-0 lg:pt-4 lg:pb-0 lg:border-l-0 lg:border-t-4">
+                      <span :class="cache.status.broker.active_circuit.length > 0 ? 'text-indigo-600 group-hover:text-indigo-800' : 'text-gray-500 group-hover:text-gray-700'" class="text-xs font-semibold tracking-wide uppercase">Step 3</span>
+                      <span class="text-sm font-medium">Route traffic</span>
+                    </div>
+                  </template>
+                </li>
+              </ol>
+            </nav>
           </div>
-        </template>
-        <template x-if="cache.accesskeys">
-          <ul role="list" class="mt-3 divide-y divide-gray-100">
-            <template x-for="accesskey in filterBy(cache.accesskeys, 'state', 'active')">
-              <li class="group flex items-center justify-between py-2">
-                <div class="flex items-center space-x-3 text-xs">
-                  <span class="w-2.5 h-2.5 flex-shrink-0 bg-green-600 rounded-full" aria-hidden="true"></span>
-                  <div class="flex-1 items-center">
-                    <span class="font-medium text-xs leading-6 pl-1">active</span>
-                    <span class="font-normal text-gray-500">valid for the next</span>
-                    <span :title="expiresDate(accesskey.expiration)" class="text-gray-500 border-b border-dotted border-gray-700" x-text="expiresTimeLeft(accesskey.expiration)"></span>
-                  </div>
-                </div>
-                <span class="text-xs" x-text="timeLeft(accesskey.duration)"></span>
-              </li>
-            </template>
-            <template x-for="accesskey in filterBy(cache.accesskeys, 'state', 'inactive')">
-              <li class="group flex items-center justify-between py-2">
-                <div class="flex items-center space-x-3 text-xs">
-                  <span class="w-2.5 h-2.5 flex-shrink-0 bg-yellow-600 rounded-full" aria-hidden="true"></span>
-                  <div class="flex-1 items-center">
-                    <span class="font-medium text-xs leading-6 pl-1">pending</span>
-                    <span class="font-normal text-gray-500">activate by</span>
-                    <span :title="expiresTimeLeft(accesskey.expiration)" class="text-gray-500 border-b border-dotted border-gray-700" x-text="expiresDate(accesskey.expiration)"></span>
-                  </div>
-                </div>
-                <span class="text-xs" x-text="timeLeft(accesskey.duration)"></span>
-              </li>
-            </template>
-            <template x-for="accesskey in filterBy(cache.accesskeys, 'state', 'expired')">
-              <li class="group flex items-center justify-between py-2">
-                <div class="flex items-center space-x-3 text-xs">
-                  <span class="w-2.5 h-2.5 flex-shrink-0 bg-red-600 rounded-full" aria-hidden="true"></span>
-                  <div class="flex-1 items-center">
-                    <span class="font-medium text-xs leading-6 pl-1">expired</span>
-                    <span class="font-normal text-gray-500">on</span>
-                    <span class="text-gray-500 border-b border-dotted border-gray-700" x-text="expiresDate(accesskey.expiration)"></span>
-                  </div>
-                </div>
-                <span class="text-xs" x-text="timeLeft(accesskey.duration)"></span>
-              </li>
-            </template>
-          </ul>
-        </template>
+        </div>
       </div>
     </div>
 
@@ -855,7 +827,7 @@
 <script type="text/javascript">
 function alpineInstance() {
   return {
-    currentTab: location.hash.replace('#','') || 'accesskeys',
+    currentTab: location.hash.replace('#','') || 'usage',
     currentPanel: '',
     alertError: '',
     waiting: [],
