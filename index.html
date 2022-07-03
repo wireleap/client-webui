@@ -514,6 +514,69 @@
             </nav>
           </div>
         </div>
+        <template x-if="cache.forwarders_tun">
+          <div>
+            <div x-transition x-show="cache.forwarders_tun.state == 'active'">
+              <p class="text-xs text-gray-900 font-medium uppercase pt-4">Routing all traffic</p>
+              <div class="space-y-3 mt-3 p-3 bg-white border border-gray-300 rounded-md">
+                <p class="text-gray-600 text-sm">All traffic on the system is being routed via TUN</p>
+              </div>
+            </div>
+            <template x-if="cache.forwarders_socks">
+              <div x-transition x-show="cache.forwarders_tun.state != 'active' && cache.forwarders_socks.state == 'active'">
+                <p class="text-xs text-gray-900 font-medium uppercase pt-4">Routing specific traffic</p>
+                <div x-data="{'selected': 'google-chrome'}" class="space-y-3 mt-3 p-3 pt-0 bg-white border border-gray-300 rounded-md">
+                  <div class="flex flex-wrap">
+                    <template x-for="app in ['google-chrome', 'chromium-browser', 'firefox', 'brave-browser', 'curl', 'custom', 'intercept']">
+                      <div @click="selected=app" :class="selected == app ? 'text-gray-600 border-gray-400' : 'text-gray-400 border-gray-200'" :title="app" class="flex mr-4 mt-4 items-center justify-center h-20 w-20 cursor-pointer text-xs rounded-xl p-4 border-2 hover:text-gray-600 hover:border-gray-400">
+                        <template x-if="app == 'google-chrome'">
+                          <svg class="h-10 w-10" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M879 309H500c-46 1-90 17-125 47-34 30-57 72-63 117L172 231c80-99 201-156 328-156 160 0 307 91 379 234M339 602c35 55 96 88 161 89 24-1 48-5 71-14L431 919c-99-16-190-67-255-144S75 601 75 500c0-83 24-164 70-233 64 111 128 225 194 335m267-208c28 28 44 66 44 106s-16 78-44 106-66 44-106 44-78-16-106-44-44-66-44-106 16-78 44-106 66-44 106-44 78 16 106 44m291-44c18 48 28 99 28 150 0 113-45 221-124 301-80 79-188 124-301 124-8 0-16 0-24-1l192-335c15-28 22-58 23-89-1-59-28-114-74-150h280"/></svg>
+                        </template>
+                        <template x-if="app == 'chromium-browser'">
+                          <svg class="h-9 w-9" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M500 0C224 0 0 224 0 500s224 500 500 500 500-224 500-500S776 0 500 0m379 309H500c-46 1-90 17-125 47-34 30-57 72-63 117L172 231c80-99 201-156 328-156 160 0 307 91 379 234M339 602c35 55 96 88 161 89 24-1 48-5 71-14L431 919c-99-16-190-67-255-144S75 601 75 500c0-83 24-164 70-233 64 111 128 225 194 335m267-208c28 28 44 66 44 106s-16 78-44 106-66 44-106 44-78-16-106-44-44-66-44-106 16-78 44-106 66-44 106-44 78 16 106 44m291-44c18 48 28 99 28 150 0 113-45 221-124 301-80 79-188 124-301 124-8 0-16 0-24-1l192-335c15-28 22-58 23-89-1-59-28-114-74-150h280"/></svg>
+                        </template>
+                        <template x-if="app == 'firefox'">
+                          <svg class="h-9 w-9" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M500 0C224 0 0 224 0 500s224 500 500 500 500-224 500-500S776 0 500 0m0 25c262 0 475 213 475 475S762 975 500 975 25 762 25 500 238 25 500 25m237 145c4-17 10-31 19-41 0 31 84 121 123 233 11 30 17 60 19 88 8-12 14-18 14-18 40 205-98 479-401 481-94 1-148-23-225-65v-1c-102-62-143-143-161-182-31-68-36-127-34-176-5 15-9 30-12 45 2-73 15-120 28-149-10 13-18 28-25 44 16-57 32-92 47-115 3-6 11-17 22-30-9-55 21-99 57-142 0 27 17 61 39 84 27-6 59-5 95 8 27-28 71-44 114-34-29 12-44 39-64 73v1c3 10 13 34 39 36 60 6 67 11 67 18v6c-4 25-17 36-49 47-13 6-29 14-39 20-3 2-6 4-8 7v1c2 15 12 37-7 54-9-14-29-21-45-10-46 56 80 99 142 90 62-8 69 15 77 30 8 17-1 30-16 25-21-7-44 17-64 24-26 14-66 19-105 10-6-1-13-3-20-6 11 17 30 35 60 55 129 61 267-24 282-174 14-150-152-181-123-348 12-42 33-75 60-110 0 20 21 52 94 121"/></svg>
+                        </template>
+                        <template x-if="app == 'brave-browser'">
+                          <svg class="h-8 w-8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="m15.68 0 2.096 2.38s1.84-.512 2.709.358c.868.87 1.584 1.638 1.584 1.638l-.562 1.381.715 2.047s-2.104 7.98-2.35 8.955c-.486 1.919-.818 2.66-2.198 3.633a186.42 186.42 0 0 1-4.293 2.916c-.409.256-.92.692-1.38.692-.46 0-.97-.436-1.38-.692a185.796 185.796 0 0 1-4.293-2.916c-1.38-.973-1.712-1.714-2.197-3.633-.247-.975-2.351-8.955-2.351-8.955l.715-2.047-.562-1.381s.716-.768 1.585-1.638c.868-.87 2.708-.358 2.708-.358L8.321 0h7.36zm-3.679 14.936c-.14 0-1.038.317-1.758.69-.72.373-1.242.637-1.409.742-.167.104-.065.301.087.409.152.107 2.194 1.69 2.393 1.866.198.175.489.464.687.464.198 0 .49-.29.688-.464.198-.175 2.24-1.759 2.392-1.866.152-.108.254-.305.087-.41-.167-.104-.689-.368-1.41-.741-.72-.373-1.617-.69-1.757-.69zm0-11.278s-.409.001-1.022.206-1.278.46-1.584.46c-.307 0-2.581-.434-2.581-.434S4.119 7.152 4.119 7.849c0 .697.339.881.68 1.243l2.02 2.149c.192.203.59.511.356 1.066-.235.555-.58 1.26-.196 1.977.384.716 1.042 1.194 1.464 1.115.421-.08 1.412-.598 1.776-.834.364-.237 1.518-1.19 1.518-1.554 0-.365-1.193-1.02-1.413-1.168-.22-.15-1.226-.725-1.247-.95-.02-.227-.012-.293.284-.851.297-.559.831-1.304.742-1.8-.089-.495-.95-.753-1.565-.986-.615-.232-1.799-.671-1.947-.74-.148-.068-.11-.133.339-.175.448-.043 1.719-.212 2.292-.052.573.16 1.552.403 1.632.532.079.13.149.134.067.579-.081.445-.5 2.581-.541 2.96-.04.38-.12.63.288.724.409.094 1.097.256 1.333.256s.924-.162 1.333-.256c.408-.093.329-.344.288-.723-.04-.38-.46-2.516-.541-2.961-.082-.445-.012-.45.067-.579.08-.129 1.059-.372 1.632-.532.573-.16 1.845.009 2.292.052.449.042.487.107.339.175-.148.069-1.332.508-1.947.74-.615.233-1.476.49-1.565.986-.09.496.445 1.241.742 1.8.297.558.304.624.284.85-.02.226-1.026.802-1.247.95-.22.15-1.413.804-1.413 1.169 0 .364 1.154 1.317 1.518 1.554.364.236 1.355.755 1.776.834.422.079 1.08-.4 1.464-1.115.384-.716.039-1.422-.195-1.977-.235-.555.163-.863.355-1.066l2.02-2.149c.341-.362.68-.546.68-1.243 0-.697-2.695-3.96-2.695-3.96s-2.274.436-2.58.436c-.307 0-.972-.256-1.585-.461-.613-.205-1.022-.206-1.022-.206z"/></svg>
+                        </template>
+                        <template x-if="app == 'curl'">
+                          <span class="text-md font-mono">curl://</span>
+                        </template>
+                        <template x-if="app == 'custom'">
+                          <span class="font-extrabold">custom</span>
+                        </template>
+                        <template x-if="app == 'intercept'">
+                          <span class="font-extrabold">intercept</span>
+                        </template>
+                      </div>
+                    </template>
+                  </div>
+                  <div class="text-sm">
+                    <template x-if="selected != 'custom' && selected != 'intercept'">
+                      <div class="text-gray-600 font-mono py-2">
+                        <p>wireleap exec <span x-text="selected"></span></p>
+                      </div>
+                    </template>
+                    <template x-if="selected == 'custom'">
+                      <template x-if="cache.config">
+                        <div class="text-gray-600 font-mono py-2">
+                          <p x-text="'socks5h://' + cache.config.forwarders.socks.address"></p>
+                        </div>
+                      </template>
+                    </template>
+                    <template x-if="selected == 'intercept'">
+                      <div class="text-gray-600 font-mono py-2">
+                        <p>wireleap intercept ssh USER@HOST</p>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
       </div>
     </div>
 
