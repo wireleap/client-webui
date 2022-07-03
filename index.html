@@ -210,6 +210,20 @@
                   </div>
                 </div>
               </template>
+              <template x-for="accesskey in filterBy(cache.accesskeys, 'state', 'expired')">
+                <div class="border-t border-gray-600 m-4 pt-4">
+                  <div class="flex justify-between items-center">
+                    <span class="mr-5 w-2.5 h-2.5 flex-shrink-0 bg-red-500 rounded-full" aria-hidden="true"></span>
+                    <span class="flex-grow flex flex-col">
+                      <span class="text-sm font-medium text-gray-300">Expired</span>
+                      <span class="text-sm text-gray-50">
+                        <span>Expired at</span>
+                        <span class="border-b border-dotted border-gray-400" :title="timeLeft(accesskey.duration) + ' access')" x-text="expiresDate(accesskey.expiration)"></span>
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </template>
             </div>
           </template>
         </template>
