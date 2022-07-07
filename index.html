@@ -135,6 +135,10 @@
                 <span class="font-medium text-gray-300">Platform</span>
                 <span class="text-gray-50" x-text="cache.runtime.platform.os + '/' + cache.runtime.platform.arch"></span>
               </div>
+              <div class="flex items-center justify-between">
+                <span class="font-medium text-gray-300">Built</span>
+                <span class="text-gray-50" x-text="expiresDate(cache.runtime.build.time)"></span>
+              </div>
             </div>
           </template>
           <template x-if="!cache.runtime">
