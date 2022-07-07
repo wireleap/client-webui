@@ -194,7 +194,7 @@
                   <span x-text="hops"></span>
                   <span x-text="hops > 1 ? ' hops' : ' hop'"></span>
                 </div>
-                <button @click="hops += 1" :disabled="hops == 5" type="button" class="disabled:text-gray-200 -ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-400 bg-gray-500 text-gray-50 hover:bg-gray-400 text-sm font-medium rounded-r-md focus:outline-none">+</button>
+                <button @click="hops += 1" :disabled="hops == maxHops()" type="button" class="disabled:text-gray-200 -ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-400 bg-gray-500 text-gray-50 hover:bg-gray-400 text-sm font-medium rounded-r-md focus:outline-none">+</button>
               </div>
               <!-- panel:circuit:hops:circuit -->
               <div x-show="cache.status.broker.active_circuit.length > 0 && hops == cache.config.broker.circuit.hops">
@@ -1072,6 +1072,13 @@ function alpineInstance() {
         .finally(() => {
           this.waiting.pop(uri);
         });
+    },
+    maxHops() {
+      if (!this.cache.relays) return 0;
+      if (this.filterBy(this.cache.relays, 'role', 'backing').length == 0) return 0;
+      if (this.filterBy(this.cache.relays, 'role', 'fronting').length == 0) return 1;
+      if (this.filterBy(this.cache.relays, 'role', 'entropic').length == 0) return 2;
+      return this.filterBy(this.cache.relays, 'role', 'entropic').length + 2;
     },
     whitelistRoleCount(whitelist, role) {
       if (!this.cache.relays) return 0;
