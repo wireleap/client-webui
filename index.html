@@ -136,8 +136,8 @@
                 <span class="text-gray-50" x-text="cache.runtime.platform.os + '/' + cache.runtime.platform.arch"></span>
               </div>
               <div class="flex items-center justify-between">
-                <span class="font-medium text-gray-300">Built</span>
-                <span class="text-gray-50" x-text="expiresDate(cache.runtime.build.time)"></span>
+                <span class="font-medium text-gray-300">Build time</span>
+                <span class="text-gray-50" x-text="epochToDate(cache.runtime.build.time)"></span>
               </div>
             </div>
           </template>
@@ -342,7 +342,7 @@
                       <span class="text-sm font-medium text-gray-300">Active</span>
                       <span class="text-sm text-gray-50">
                         <span>Valid for the next</span>
-                        <span class="border-b border-dotted border-gray-400" :title="timeLeft(accesskey.duration) + ' access, expires on ' + expiresDate(accesskey.expiration)"  x-text="expiresTimeLeft(accesskey.expiration)"></span>
+                        <span class="border-b border-dotted border-gray-400" :title="timeLeft(accesskey.duration) + ' access, expires on ' + epochToDate(accesskey.expiration)"  x-text="epochToTimeLeft(accesskey.expiration)"></span>
                       </span>
                     </span>
                   </div>
@@ -356,7 +356,7 @@
                       <span class="text-sm font-medium text-gray-300">Pending</span>
                       <span class="text-sm text-gray-50">
                         <span>Activate by</span>
-                        <span class="border-b border-dotted border-gray-400" :title="timeLeft(accesskey.duration) + ' access, must be activated in ' + expiresTimeLeft(accesskey.expiration)" x-text="expiresDate(accesskey.expiration)"></span>
+                        <span class="border-b border-dotted border-gray-400" :title="timeLeft(accesskey.duration) + ' access, must be activated in ' + epochToTimeLeft(accesskey.expiration)" x-text="epochToDate(accesskey.expiration)"></span>
                       </span>
                     </span>
                     <template x-if="!cache.config.broker.accesskey.use_on_demand">
@@ -373,7 +373,7 @@
                       <span class="text-sm font-medium text-gray-300">Expired</span>
                       <span class="text-sm text-gray-50">
                         <span>Expired at</span>
-                        <span class="border-b border-dotted border-gray-400" :title="timeLeft(accesskey.duration) + ' access'" x-text="expiresDate(accesskey.expiration)"></span>
+                        <span class="border-b border-dotted border-gray-400" :title="timeLeft(accesskey.duration) + ' access'" x-text="epochToDate(accesskey.expiration)"></span>
                       </span>
                     </span>
                   </div>
@@ -589,7 +589,7 @@
               <template x-if="cache.accesskeys">
                 <template x-for="accesskey in filterBy(cache.accesskeys, 'state', 'active')">
                   <span class="text-sm text-gray-50">Active key valid for the next
-                    <span class="border-b border-dotted border-gray-300" x-text="expiresTimeLeft(accesskey.expiration)"></span>
+                    <span class="border-b border-dotted border-gray-300" x-text="epochToTimeLeft(accesskey.expiration)"></span>
                   </span>
                 </template>
               </template>
@@ -1137,11 +1137,11 @@ function alpineInstance() {
       if (m > 0) return (mDisplay + ", " + sDisplay).replace(/,\s*$/, '');
       return sDisplay
     },
-    expiresDate(timestamp) {
+    epochToDate(timestamp) {
       let exp = new Date(timestamp * 1000);
       return String(exp).split(" (")[0];
     },
-    expiresTimeLeft(timestamp) {
+    epochToTimeLeft(timestamp) {
       now = new Date();
       now_unix = Math.floor(now.getTime() / 1000);
       seconds = timestamp - now_unix;
