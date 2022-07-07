@@ -710,25 +710,28 @@
                       </div>
                     </template>
                   </div>
-                  <div class="text-sm">
-                    <template x-if="selected != 'custom' && selected != 'intercept'">
-                      <div class="text-gray-600 font-mono py-2">
-                        <p>wireleap exec <span x-text="selected"></span></p>
-                      </div>
-                    </template>
-                    <template x-if="selected == 'custom'">
-                      <template x-if="cache.config">
+                  <template x-if="cache.config && cache.status && cache.runtime">
+                    <div class="text-sm">
+                      <template x-if="selected != 'custom' && selected != 'intercept'">
+                        <div class="text-gray-600 font-mono py-2">
+                          <p x-text="'cd ' + cache.status.home"></p>
+                          <p x-text="'.' + osSlash() + 'wireleap exec ' + selected"</p>
+                        </div>
+                      </template>
+                      <template x-if="selected == 'custom'">
                         <div class="text-gray-600 font-mono py-2">
                           <p x-text="'socks5h://' + cache.config.forwarders.socks.address"></p>
                         </div>
                       </template>
-                    </template>
-                    <template x-if="selected == 'intercept'">
-                      <div class="text-gray-600 font-mono py-2">
-                        <p>wireleap intercept ssh USER@HOST</p>
-                      </div>
-                    </template>
-                  </div>
+                      <template x-if="selected == 'intercept'">
+                        <div class="text-gray-600 font-mono py-2">
+                          <p x-show="cache.runtime.platform.os == 'linux'" x-text="'cd ' + cache.status.home"></p>
+                          <p x-show="cache.runtime.platform.os == 'linux'">./wireleap intercept ssh USER@HOST</p>
+                          <p x-show="cache.runtime.platform.os != 'linux'">intercept is not supported on your platform</p>
+                        </div>
+                      </template>
+                    </div>
+                  </template>
                 </div>
               </div>
             </template>
