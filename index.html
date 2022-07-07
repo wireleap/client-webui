@@ -90,6 +90,27 @@
         <div class="m-4 divide-y divide-gray-600">
           <template x-if="cache.runtime">
             <div class="space-y-3 pt-5 w-full text-sm">
+              <div x-show="cache.status.upgrade.required" class="bg-red-200 text-red-700 rounded-md">
+                <p class="w-full bg-red-500 text-red-100 rounded-t-md p-2">Upgrade is required</p>
+                <template x-if="!cache.runtime.upgrade.supported">
+                  <div class="font-mono whitespace-nowrap py-3 pl-2">
+                    <p>Inline upgrades are not enabled in your build.</p>
+                  </div>
+                </template>
+                <template x-if="cache.runtime.upgrade.supported && cache.forwarders_tun && cache.forwarders_socks">
+                  <div class="font-mono whitespace-nowrap py-3 pl-2">
+                    <p x-text="'cd '+ cache.status.home"></p>
+                    <p x-show="cache.forwarders_tun.state == 'active'" x-text="'.' + osSlash() + 'wireleap tun stop'"></p>
+                    <p x-show="cache.forwarders_tun.binary.ok">sudo rm wireleap_tun</p>
+                    <p x-show="cache.forwarders_socks.state == 'active'" x-text="'.' + osSlash() + 'wireleap socks stop'"></p>
+                    <p x-text="'.' + osSlash() + 'wireleap stop'"></p>
+                    <p x-text="'.' + osSlash() + 'wireleap upgrade'"></p>
+                    <p x-text="'.' + osSlash() + 'wireleap start'"></p>
+                    <p x-show="cache.forwarders_tun.binary.ok">sudo chown 0:0 wireleap_tun</p>
+                    <p x-show="cache.forwarders_tun.binary.ok">sudo chmod u+s wireleap_tun</p>
+                  </div>
+                </template>
+              </div>
               <div class="flex items-center justify-between">
                 <span class="font-medium text-gray-300">API</span>
                 <span class="text-gray-50" x-text="cache.runtime.versions.api"></span>
@@ -364,10 +385,16 @@
   <main class="flex-col min-w-[500px] bg-gray-700 overflow-y-auto scroll-container">
     <!-- navbar -->
     <div :class="running() ? 'bg-green-500' : 'bg-gray-600'" class="flex items-center justify-between p-4" x-model="running">
-      <button @click="currentPanel='info'" class="text-white focus:outline-none rounded-full -m-2 p-1 hover:bg-white hover:bg-opacity-25 transition duration-300">
+      <button @click="currentPanel='info'" class="inline-block relative text-white focus:outline-none rounded-full -m-2 p-1 hover:bg-white hover:bg-opacity-25 transition duration-300">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
+        <template x-if="cache.status">
+          <span x-show="cache.status.upgrade.required" class="absolute flex top-0 right-0 h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+          </span>
+        </template>
       </button>
       <span class="text-md text-white" x-text="waiting.length > 0 ? waiting.at(-1) : 'wireleap'"></span>
       <button @click="refresh()" title="refresh" class="text-white focus:outline-none rounded-full -my-2 -mx-1 p-1 hover:bg-white hover:bg-opacity-25 transition duration-300">
@@ -1071,6 +1098,10 @@ function alpineInstance() {
     filterHighlight(s) {
       if (this.filter === '') return s;
       return s.replaceAll(new RegExp(`(${this.filter.toLowerCase()})`, 'ig'), '<span class="font-bold">$1</span>')
+    },
+    osSlash() {
+      if (!this.cache.runtime) return;
+      return this.cache.runtime.platform.os == 'windows' ? '\\' : '/';
     },
     arraysEqual(arrOne, arrTwo) {
       return arrOne.length === arrTwo.length && arrOne.every(function (element) { return arrTwo.includes(element); });
