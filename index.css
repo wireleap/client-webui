@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+[x-cloak] {
+  display: none !important;
+}
+.scroll-container::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: lightgrey;
+  border-radius: 5px;
+}
+.scroll-container::-webkit-scrollbar-track {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
