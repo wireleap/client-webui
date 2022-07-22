@@ -13,6 +13,8 @@ utilizing the [client API](https://wireleap.com/docs/client-api/).
 
 > Important: This should be considered pre-release status.
 
+![Panel screenshots](panels.png)
+
 ## Installation
 
 The easiest way to install is by using `git`:
