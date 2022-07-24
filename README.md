@@ -45,3 +45,7 @@ Once the webroot is populated, browse to: [http://127.0.0.1:13490](http://127.0.
 tailwindcss -i index.css -o build/index.css [--watch]
 ```
 
+## License
+
+The MIT License (MIT)
+
