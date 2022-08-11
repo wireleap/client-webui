@@ -54,10 +54,24 @@ function alpineInstance() {
           if (uri.startsWith("/api/forwarders/socks")) {
             this.cache.forwarders_socks = data;
             this.apiGetText("/api/forwarders/socks/log");
+            for (let i = 0; i < 10; i++) {
+              if ( !['activating','deactivating'].includes(this.cache.forwarders_socks.state) ) { break; }
+              return this.sleep(500).then(() => {
+                this.apiGetJson("/api/forwarders/socks");
+                this.apiGetText("/api/forwarders/socks/log");
+              });
+            }
           }
           if (uri.startsWith("/api/forwarders/tun")) {
             this.cache.forwarders_tun = data;
             this.apiGetText("/api/forwarders/tun/log");
+            for (let i = 0; i < 10; i++) {
+              if ( !['activating','deactivating'].includes(this.cache.forwarders_tun.state) ) { break; }
+              return this.sleep(500).then(() => {
+                this.apiGetJson("/api/forwarders/tun");
+                this.apiGetText("/api/forwarders/tun/log");
+              });
+            }
           }
           if (uri.startsWith("/api/config")) {
             this.cache.config = data;
@@ -117,6 +131,9 @@ function alpineInstance() {
         .finally(() => {
           this.waiting.pop(uri);
         });
+    },
+    sleep(milliseconds) {
+      return new Promise((resolve) => setTimeout(resolve, milliseconds));
     },
     maxHops() {
       if (!this.cache.relays) return 0;
